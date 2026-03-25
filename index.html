@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Reserva & Bolos | Nossa Carne</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -13,59 +13,91 @@
             --secondary: #27ae60; 
             --accent: #f39c12;
             --text: #2d3436;
-            --bg-overlay: rgba(255, 255, 255, 0.97); 
+            --bg-overlay: rgba(255, 255, 255, 0.98); 
         }
+
+        * { -webkit-tap-highlight-color: transparent; }
 
         body { 
             font-family: 'Poppins', sans-serif; 
-            margin: 0; padding: 15px; color: var(--text);
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+            margin: 0; padding: 0; color: var(--text);
+            background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), 
                         url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
             background-size: cover; background-position: center; background-attachment: fixed;
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
         }
 
         .container { 
-            width: 100%; max-width: 450px; background: var(--bg-overlay); 
-            padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            width: 100%; 
+            max-width: 500px; 
+            background: var(--bg-overlay); 
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
             box-sizing: border-box;
+            margin: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container { margin: 10px; padding: 20px; border-radius: 20px; }
+            body { align-items: flex-start; }
         }
 
         .header { text-align: center; margin-bottom: 20px; }
-        .header img { width: 70px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 8px; }
-        .header h2 { margin: 0; font-size: 22px; color: #333; }
+        .header img { width: 85px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 10px; }
+        .header h2 { margin: 0; font-size: 24px; color: #222; font-weight: 600; }
 
         .regras-box {
-            background: #fff0f0; border-left: 4px solid var(--primary);
-            padding: 12px; margin-bottom: 15px; border-radius: 8px; font-size: 11px; line-height: 1.5;
+            background: #fff5f5; border-left: 5px solid var(--primary);
+            padding: 15px; margin-bottom: 20px; border-radius: 12px; font-size: 12px; line-height: 1.6;
         }
 
-        .grid-duplo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .campo { margin-bottom: 12px; }
-        label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 12px; color: #444; }
+        .grid-duplo { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .campo { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 13px; color: #444; }
         
         .input-container { position: relative; }
-        .input-container i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #888; }
+        .input-container i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #a0a0a0; }
         
         input, select { 
-            width: 100%; padding: 10px 10px 10px 38px; 
-            border: 1.5px solid #ddd; border-radius: 10px; 
-            font-size: 14px; box-sizing: border-box; outline: none;
+            width: 100%; padding: 12px 12px 12px 42px; 
+            border: 2px solid #eee; border-radius: 12px; 
+            font-size: 15px; box-sizing: border-box; outline: none;
+            transition: border-color 0.3s;
+            background-color: #fdfdfd;
+            appearance: none;
         }
 
-        .secao-bolo { margin-top: 10px; padding: 15px; border-radius: 12px; display: none; }
-        .modo-cortesia { background: #e6f7ed; border: 2px solid var(--secondary); }
-        .modo-encomenda { background: #fff4e6; border: 2px solid var(--accent); }
+        input:focus, select:focus { border-color: var(--primary); background-color: #fff; }
 
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 15px; font-size: 10px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+        .secao-bolo { margin-top: 15px; padding: 18px; border-radius: 15px; display: none; transition: 0.3s; }
+        .modo-cortesia { background: #f0fff4; border: 2px solid var(--secondary); }
+        .modo-encomenda { background: #fffaf0; border: 2px solid var(--accent); }
+
+        .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 12px; text-transform: uppercase; }
         .badge-cortesia { background: var(--secondary); color: #fff; }
         .badge-encomenda { background: var(--accent); color: #fff; }
 
-        .btn-enviar { 
-            width: 100%; padding: 14px; background: #25d366; color: white; 
-            border: none; border-radius: 10px; font-size: 16px; font-weight: 700; 
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+        .info-pagamento {
+            margin-top: 15px; padding: 15px; background: #fff; border-radius: 12px;
+            font-size: 13px; border: 1px dashed var(--accent); line-height: 1.6;
         }
+
+        .pix-area {
+            background: #f8f9fa; padding: 10px; border-radius: 8px; margin-top: 10px;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+
+        .pix-chave { font-family: 'Courier New', monospace; font-weight: bold; color: var(--primary); font-size: 14px; }
+
+        .btn-enviar { 
+            width: 100%; padding: 16px; background: #25d366; color: white; 
+            border: none; border-radius: 15px; font-size: 17px; font-weight: 700; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
+            margin-top: 20px; transition: 0.3s; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+        .btn-enviar:active { transform: scale(0.98); }
+        .btn-enviar:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -77,10 +109,11 @@
     </div>
 
     <div class="regras-box">
-        <h4><i class="fas fa-info-circle"></i> Regras Importantes</h4>
-        • <b>Reserva:</b> Seg a Qui. Sex a Dom: Ordem de chegada.<br>
-        • <b>Cortesia:</b> Mínimo 10 pessoas (Presença obrigatória).<br>
-        • <b>Limite de Bolo:</b> Máximo 3kg por mesa.
+        • <b>Reserva:</b> Segunda a Quinta (12h às 21:30).<br>
+        • <b>Finais de Semana:</b> Ordem de chegada.<br>
+        • <b>Cortesia:</b> 10+ pessoas (1kg Cortesia).<br>
+        • <b>Encomenda Bolo:</b> R$ 95,00/kg (50% sinal via PIX).<br>
+        • <b>Rolha:</b> Taxa de <b>R$ 40,00</b> para bolos/bebidas de fora.
     </div>
 
     <form id="reservaForm">
@@ -104,7 +137,7 @@
                 <label>Horário</label>
                 <div class="input-container">
                     <i class="fas fa-clock"></i>
-                    <input type="time" id="horario" required>
+                    <input type="time" id="horario" required onchange="validarFluxo()">
                 </div>
             </div>
         </div>
@@ -136,23 +169,32 @@
                 <div class="input-container">
                     <i class="fas fa-list"></i>
                     <select id="sabor">
-                        <option value="Mousse de Coco">Mousse de Coco</option>
-                        <option value="Ninho com Morango">Ninho com Morango</option>
-                        <option value="Coco com Doce de Leite">Coco com Doce de Leite</option>
-                        <option value="Mousse de Chocolate">Mousse de Chocolate</option>
-                        <option value="Maracujá com Chocolate">Maracujá com Chocolate</option>
+                        <option value="Brigadeiro">Brigadeiro</option>
+                        <option value="Brigadeiro Maracujá / Brig Chocolate">Brigadeiro Maracujá / Brig Chocolate</option>
                         <option value="Ninho com Nutella">Ninho com Nutella</option>
-                        <option value="Brigadeiro de Chocolate">Brigadeiro de Chocolate</option>
-                        <option value="Brigadeiro de Ninho">Brigadeiro de Ninho</option>
+                        <option value="Ninho com Morango">Ninho com Morango</option>
+                        <option value="Ninho com Abacaxi">Ninho com Abacaxi</option>
+                        <option value="Mousse de Chocolate Preto">Mousse de Chocolate Preto</option>
+                        <option value="Mousse de Coco">Mousse de Coco</option>
+                        <option value="Prestígio">Prestígio</option>
                     </select>
                 </div>
             </div>
 
             <div class="campo">
-                <label id="labelKg">Quilos (Máx 3kg)</label>
+                <label id="labelKg">Quilos (Máximo 3kg)</label>
                 <div class="input-container">
                     <i class="fas fa-weight-hanging"></i>
-                    <input type="number" id="kg" value="0" min="0" max="3" onchange="if(this.value>3)this.value=3">
+                    <input type="number" id="kg" value="1" min="1" max="3" oninput="validarFluxo()">
+                </div>
+            </div>
+
+            <div id="detalhesFinanceiros" class="info-pagamento" style="display:none;">
+                <b>Valor Total:</b> R$ <span id="valorTotal">0,00</span><br>
+                <b>Sinal para reserva (50%):</b> <span style="color:var(--primary); font-weight:bold;">R$ <span id="valorSinal">0,00</span></span>
+                <div class="pix-area">
+                    <span style="font-size: 11px; color: #666;">Chave PIX (CNPJ)</span>
+                    <span class="pix-chave">13791998000131</span>
                 </div>
             </div>
         </div>
@@ -165,39 +207,70 @@
 
 <script>
     const SEU_TELEFONE = "5511967105333";
+    const VALOR_KG = 95.00;
+
     document.getElementById('data').min = new Date().toISOString().split('T')[0];
 
     function validarFluxo() {
         const dataVal = document.getElementById('data').value;
+        const horaVal = document.getElementById('horario').value;
         const pessoas = parseInt(document.getElementById('pessoas').value) || 0;
         const querBolo = document.getElementById('querBolo').value;
         const painelBolo = document.getElementById('painelBolo');
         const badge = document.getElementById('tipoBoloBadge');
         const btn = document.getElementById('btnEnviar');
+        const kg = parseFloat(document.getElementById('kg').value) || 1;
+        const divFinanceiro = document.getElementById('detalhesFinanceiros');
 
         if(!dataVal) return;
+        
         const dataObj = new Date(dataVal + 'T12:00:00');
-        const eBloqueado = [0, 5, 6].includes(dataObj.getDay());
+        const eBloqueadoDia = [0, 5, 6].includes(dataObj.getDay());
 
-        if(eBloqueado) {
+        let eBloqueadoHora = false;
+        if(horaVal) {
+            const [h, m] = horaVal.split(':').map(Number);
+            const totalMinutos = h * 60 + m;
+            const minInicio = 12 * 60; 
+            const minFim = 21 * 60 + 30; 
+            if(totalMinutos < minInicio || totalMinutos > minFim) {
+                eBloqueadoHora = true;
+            }
+        }
+
+        if(eBloqueadoDia) {
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-lock"></i> RESERVAS: SEG A QUI';
+            painelBolo.style.display = 'none';
+        } else if(eBloqueadoHora) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-clock"></i> HORÁRIO: 12H ÀS 21:30';
             painelBolo.style.display = 'none';
         } else {
             btn.disabled = false;
             btn.innerHTML = '<i class="fab fa-whatsapp"></i> CONCLUIR RESERVA';
+            
             if(querBolo === 'sim') {
                 painelBolo.style.display = 'block';
                 if(pessoas >= 10) {
                     painelBolo.className = 'secao-bolo modo-cortesia';
-                    badge.innerText = '🎁 Cortesia Liberada';
+                    badge.innerText = '🎁 Cortesia Liberada (1kg)';
                     badge.className = 'badge badge-cortesia';
+                    divFinanceiro.style.display = 'none';
                 } else {
                     painelBolo.className = 'secao-bolo modo-encomenda';
-                    badge.innerText = '🛒 Encomenda (R$ 95/kg)';
+                    badge.innerText = '🛒 Encomenda Particular';
                     badge.className = 'badge badge-encomenda';
+                    
+                    const total = kg * VALOR_KG;
+                    const sinal = total / 2;
+                    document.getElementById('valorTotal').innerText = total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    document.getElementById('valorSinal').innerText = sinal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    divFinanceiro.style.display = 'block';
                 }
-            } else { painelBolo.style.display = 'none'; }
+            } else { 
+                painelBolo.style.display = 'none'; 
+            }
         }
     }
 
@@ -209,35 +282,37 @@
         const querBolo = document.getElementById('querBolo').value;
         
         if(!nome || !dataRaw || !horario || !pessoas) {
-            alert("Preencha todos os campos!");
+            alert("Por favor, preencha todos os campos obrigatórios!");
             return;
         }
 
         const dataBr = dataRaw.split('-').reverse().join('/');
-        
-        // Texto da Mensagem - Usando codificação para Emojis
-        let texto = `🥩 *RESERVA: NOSSA CARNE* 🥩\n\n`;
-        texto += `👤 *CLIENTE:* ${nome}\n`;
-        texto += `📅 *DATA:* ${dataBr}\n`;
-        texto += `⏰ *HORA:* ${horario}\n`;
-        texto += `👥 *CONVIDADOS:* ${pessoas} pessoas\n`;
+        let texto = `*NOVA RESERVA - NOSSA CARNE*\n\n`;
+        texto += `👤 *Cliente:* ${nome}\n`;
+        texto += `📅 *Data:* ${dataBr}\n`;
+        texto += `⏰ *Hora:* ${horario}\n`;
+        texto += `👥 *Pessoas:* ${pessoas}\n`;
+        texto += `⚠️ _Ciente da taxa de rolha (R$40) para itens de fora._\n`;
 
         if (querBolo === 'sim') {
             const sabor = document.getElementById('sabor').value;
             const kg = document.getElementById('kg').value;
             const ehCortesia = (parseInt(pessoas) >= 10);
             
-            texto += `\n──────────────────\n`;
-            texto += `🎂 *DETALHES DO BOLO* 🎂\n`;
-            texto += `✨ *Tipo:* ${ehCortesia ? 'CORTESIA 🎁' : 'ENCOMENDA 🛒'}\n`;
+            texto += `\n──────────────\n`;
+            texto += `🎂 *BOLO:* ${ehCortesia ? 'CORTESIA 🎁' : 'ENCOMENDA 🛒'}\n`;
             texto += `🍰 *Sabor:* ${sabor}\n`;
-            texto += `⚖️ *Peso:* ${kg}kg ${ehCortesia ? 'extra' : ''} (Máx 3kg)\n`;
-            texto += `──────────────────\n`;
+            texto += `⚖️ *Peso:* ${kg}kg\n`;
+
+            if (!ehCortesia) {
+                const total = (kg * VALOR_KG).toFixed(2);
+                const sinal = (total / 2).toFixed(2);
+                texto += `💰 *Total:* R$ ${total.replace('.',',')}\n`;
+                texto += `💳 *Sinal (50%):* R$ ${sinal.replace('.',',')}\n`;
+            }
+            texto += `\n──────────────\n`;
         }
 
-        texto += `\n_Aguardando confirmação da casa..._ 🏁`;
-
-        // O segredo está aqui: encodeURIComponent limpa os emojis para a URL do WhatsApp
         const url = `https://wa.me/${SEU_TELEFONE}?text=${encodeURIComponent(texto)}`;
         window.open(url, '_blank');
     }
