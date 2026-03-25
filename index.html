@@ -16,7 +16,7 @@
             --bg-overlay: rgba(255, 255, 255, 0.98); 
         }
 
-        * { -webkit-tap-highlight-color: transparent; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
 
         body { 
             font-family: 'Poppins', sans-serif; 
@@ -28,13 +28,8 @@
         }
 
         .container { 
-            width: 100%; 
-            max-width: 500px; 
-            background: var(--bg-overlay); 
-            padding: 30px; 
-            border-radius: 25px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
-            box-sizing: border-box;
+            width: 100%; max-width: 500px; background: var(--bg-overlay); 
+            padding: 30px; border-radius: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
             margin: 20px;
         }
 
@@ -49,7 +44,7 @@
 
         .regras-box {
             background: #fff5f5; border-left: 5px solid var(--primary);
-            padding: 15px; margin-bottom: 20px; border-radius: 12px; font-size: 12px; line-height: 1.6;
+            padding: 15px; margin-bottom: 20px; border-radius: 12px; font-size: 11px; line-height: 1.6;
         }
 
         .grid-duplo { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -62,15 +57,12 @@
         input, select { 
             width: 100%; padding: 12px 12px 12px 42px; 
             border: 2px solid #eee; border-radius: 12px; 
-            font-size: 15px; box-sizing: border-box; outline: none;
-            transition: border-color 0.3s;
-            background-color: #fdfdfd;
-            appearance: none;
+            font-size: 15px; outline: none; background-color: #fdfdfd; appearance: none;
         }
 
         input:focus, select:focus { border-color: var(--primary); background-color: #fff; }
 
-        .secao-bolo { margin-top: 15px; padding: 18px; border-radius: 15px; display: none; transition: 0.3s; }
+        .secao-bolo { margin-top: 15px; padding: 18px; border-radius: 15px; display: none; }
         .modo-cortesia { background: #f0fff4; border: 2px solid var(--secondary); }
         .modo-encomenda { background: #fffaf0; border: 2px solid var(--accent); }
 
@@ -80,15 +72,17 @@
 
         .info-pagamento {
             margin-top: 15px; padding: 15px; background: #fff; border-radius: 12px;
-            font-size: 13px; border: 1px dashed var(--accent); line-height: 1.6;
+            font-size: 13px; border: 1px dashed var(--accent); line-height: 1.6; text-align: center;
         }
 
-        .pix-area {
-            background: #f8f9fa; padding: 10px; border-radius: 8px; margin-top: 10px;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-        }
+        .pix-qr-container { margin: 10px auto; width: 120px; height: 120px; background: #eee; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; }
+        .pix-qr-container img { width: 100%; height: 100%; object-fit: cover; }
 
-        .pix-chave { font-family: 'Courier New', monospace; font-weight: bold; color: var(--primary); font-size: 14px; }
+        .btn-copiar {
+            background: #f1f2f6; border: 1px solid #dfe4ea; padding: 8px; border-radius: 8px;
+            font-size: 12px; font-weight: 600; cursor: pointer; color: #2f3542;
+            display: inline-flex; align-items: center; gap: 5px; margin-top: 5px;
+        }
 
         .btn-enviar { 
             width: 100%; padding: 16px; background: #25d366; color: white; 
@@ -96,8 +90,7 @@
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
             margin-top: 20px; transition: 0.3s; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
         }
-        .btn-enviar:active { transform: scale(0.98); }
-        .btn-enviar:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
+        .btn-enviar:disabled { background: #bdc3c7; box-shadow: none; }
     </style>
 </head>
 <body>
@@ -110,10 +103,9 @@
 
     <div class="regras-box">
         • <b>Reserva:</b> Segunda a Quinta (12h às 21:30).<br>
-        • <b>Finais de Semana:</b> Ordem de chegada.<br>
-        • <b>Cortesia:</b> 10+ pessoas (1kg Cortesia).<br>
-        • <b>Encomenda Bolo:</b> R$ 95,00/kg (50% sinal via PIX).<br>
-        • <b>Rolha:</b> Taxa de <b>R$ 40,00</b> para bolos/bebidas de fora.
+        • <b>Rolha:</b> Taxa de <b>R$ 40,00</b> p/ itens de fora.<br>
+        • <b>Cortesia:</b> 10+ pessoas (1kg Grátis / Adicional R$ 95/kg).<br>
+        • <b>Bolo Encomenda:</b> R$ 95,00/kg (50% sinal).
     </div>
 
     <form id="reservaForm">
@@ -190,12 +182,17 @@
             </div>
 
             <div id="detalhesFinanceiros" class="info-pagamento" style="display:none;">
-                <b>Valor Total:</b> R$ <span id="valorTotal">0,00</span><br>
-                <b>Sinal para reserva (50%):</b> <span style="color:var(--primary); font-weight:bold;">R$ <span id="valorSinal">0,00</span></span>
-                <div class="pix-area">
-                    <span style="font-size: 11px; color: #666;">Chave PIX (CNPJ)</span>
-                    <span class="pix-chave">13791998000131</span>
+                <b>Total a Pagar: R$ <span id="valorTotal">0,00</span></b><br>
+                <b>Sinal para reserva (50%): <span style="color:var(--primary);">R$ <span id="valorSinal">0,00</span></span></b>
+                
+                <div class="pix-qr-container">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=13791998000131" alt="QR Code PIX">
                 </div>
+                
+                <small>Chave CNPJ: 13.791.998/0001-31</small><br>
+                <button type="button" class="btn-copiar" onclick="copiarPix()">
+                    <i class="fas fa-copy"></i> Copiar Chave PIX
+                </button>
             </div>
         </div>
 
@@ -208,8 +205,14 @@
 <script>
     const SEU_TELEFONE = "5511967105333";
     const VALOR_KG = 95.00;
+    const CHAVE_PIX = "13791998000131";
 
     document.getElementById('data').min = new Date().toISOString().split('T')[0];
+
+    function copiarPix() {
+        navigator.clipboard.writeText(CHAVE_PIX);
+        alert("Chave PIX copiada!");
+    }
 
     function validarFluxo() {
         const dataVal = document.getElementById('data').value;
@@ -231,20 +234,12 @@
         if(horaVal) {
             const [h, m] = horaVal.split(':').map(Number);
             const totalMinutos = h * 60 + m;
-            const minInicio = 12 * 60; 
-            const minFim = 21 * 60 + 30; 
-            if(totalMinutos < minInicio || totalMinutos > minFim) {
-                eBloqueadoHora = true;
-            }
+            if(totalMinutos < 720 || totalMinutos > 1290) eBloqueadoHora = true;
         }
 
-        if(eBloqueadoDia) {
+        if(eBloqueadoDia || eBloqueadoHora) {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-lock"></i> RESERVAS: SEG A QUI';
-            painelBolo.style.display = 'none';
-        } else if(eBloqueadoHora) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-clock"></i> HORÁRIO: 12H ÀS 21:30';
+            btn.innerHTML = eBloqueadoDia ? 'RESERVAS: SEG A QUI' : 'HORÁRIO: 12H ÀS 21:30';
             painelBolo.style.display = 'none';
         } else {
             btn.disabled = false;
@@ -252,25 +247,29 @@
             
             if(querBolo === 'sim') {
                 painelBolo.style.display = 'block';
+                let total = 0;
+                
                 if(pessoas >= 10) {
                     painelBolo.className = 'secao-bolo modo-cortesia';
-                    badge.innerText = '🎁 Cortesia Liberada (1kg)';
+                    badge.innerText = '🎁 1kg Cortesia Aplicado';
                     badge.className = 'badge badge-cortesia';
-                    divFinanceiro.style.display = 'none';
+                    // Calcula apenas o excedente (Ex: 2kg - 1kg cortesia = 1kg cobrado)
+                    total = Math.max(0, (kg - 1) * VALOR_KG);
                 } else {
                     painelBolo.className = 'secao-bolo modo-encomenda';
                     badge.innerText = '🛒 Encomenda Particular';
                     badge.className = 'badge badge-encomenda';
-                    
-                    const total = kg * VALOR_KG;
-                    const sinal = total / 2;
-                    document.getElementById('valorTotal').innerText = total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                    document.getElementById('valorSinal').innerText = sinal.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                    divFinanceiro.style.display = 'block';
+                    total = kg * VALOR_KG;
                 }
-            } else { 
-                painelBolo.style.display = 'none'; 
-            }
+
+                if(total > 0) {
+                    document.getElementById('valorTotal').innerText = total.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    document.getElementById('valorSinal').innerText = (total/2).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                    divFinanceiro.style.display = 'block';
+                } else {
+                    divFinanceiro.style.display = 'none';
+                }
+            } else { painelBolo.style.display = 'none'; }
         }
     }
 
@@ -278,45 +277,30 @@
         const nome = document.getElementById('nome').value;
         const dataRaw = document.getElementById('data').value;
         const horario = document.getElementById('horario').value;
-        const pessoas = document.getElementById('pessoas').value;
+        const pessoas = parseInt(document.getElementById('pessoas').value);
         const querBolo = document.getElementById('querBolo').value;
         
-        if(!nome || !dataRaw || !horario || !pessoas) {
-            alert("Por favor, preencha todos os campos obrigatórios!");
-            return;
-        }
+        if(!nome || !dataRaw || !horario || !pessoas) return alert("Preencha tudo!");
 
         const dataBr = dataRaw.split('-').reverse().join('/');
-        let texto = `*NOVA RESERVA - NOSSA CARNE*\n\n`;
-        texto += `👤 *Cliente:* ${nome}\n`;
-        texto += `📅 *Data:* ${dataBr}\n`;
-        texto += `⏰ *Hora:* ${horario}\n`;
-        texto += `👥 *Pessoas:* ${pessoas}\n`;
-        texto += `⚠️ _Ciente da taxa de rolha (R$40) para itens de fora._\n`;
+        let texto = `*RESERVA - NOSSA CARNE*\n\n👤 *Cliente:* ${nome}\n📅 *Data:* ${dataBr}\n⏰ *Hora:* ${horario}\n👥 *Pessoas:* ${pessoas}\n⚠️ _Ciente da taxa de rolha (R$40)._`;
 
         if (querBolo === 'sim') {
-            const sabor = document.getElementById('sabor').value;
-            const kg = document.getElementById('kg').value;
-            const ehCortesia = (parseInt(pessoas) >= 10);
+            const kg = parseFloat(document.getElementById('kg').value);
+            const ehCortesia = (pessoas >= 10);
+            const valorTotal = ehCortesia ? Math.max(0, (kg - 1) * VALOR_KG) : (kg * VALOR_KG);
             
-            texto += `\n──────────────\n`;
-            texto += `🎂 *BOLO:* ${ehCortesia ? 'CORTESIA 🎁' : 'ENCOMENDA 🛒'}\n`;
-            texto += `🍰 *Sabor:* ${sabor}\n`;
-            texto += `⚖️ *Peso:* ${kg}kg\n`;
-
-            if (!ehCortesia) {
-                const total = (kg * VALOR_KG).toFixed(2);
-                const sinal = (total / 2).toFixed(2);
-                texto += `💰 *Total:* R$ ${total.replace('.',',')}\n`;
-                texto += `💳 *Sinal (50%):* R$ ${sinal.replace('.',',')}\n`;
+            texto += `\n\n🎂 *BOLO:* ${ehCortesia ? 'CORTESIA (1kg Grátis)' : 'ENCOMENDA'}\n🍰 *Sabor:* ${document.getElementById('sabor').value}\n⚖️ *Peso:* ${kg}kg`;
+            
+            if(valorTotal > 0) {
+                texto += `\n💰 *Total Excedente:* R$ ${valorTotal.toFixed(2).replace('.',',')}\n💳 *Sinal 50%:* R$ ${(valorTotal / 2).toFixed(2).replace('.',',')}`;
+            } else if(ehCortesia) {
+                texto += `\n✨ *Status:* Cortesia Total (100% Grátis)`;
             }
-            texto += `\n──────────────\n`;
         }
 
-        const url = `https://wa.me/${SEU_TELEFONE}?text=${encodeURIComponent(texto)}`;
-        window.open(url, '_blank');
+        window.open(`https://wa.me/${SEU_TELEFONE}?text=${encodeURIComponent(texto)}`, '_blank');
     }
 </script>
-
 </body>
 </html>
