@@ -90,7 +90,7 @@
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
             margin-top: 20px; transition: 0.3s; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
         }
-        .btn-enviar:disabled { background: #bdc3c7; box-shadow: none; }
+        .btn-enviar:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -207,6 +207,7 @@
     const VALOR_KG = 95.00;
     const CHAVE_PIX = "13791998000131";
 
+    // Bloqueia datas passadas no calendário
     document.getElementById('data').min = new Date().toISOString().split('T')[0];
 
     function copiarPix() {
@@ -215,7 +216,8 @@
     }
 
     function validarFluxo() {
-        const dataVal = document.getElementById('data').value;
+        const campoData = document.getElementById('data');
+        const dataVal = campoData.value;
         const horaVal = document.getElementById('horario').value;
         const pessoas = parseInt(document.getElementById('pessoas').value) || 0;
         const querBolo = document.getElementById('querBolo').value;
@@ -227,19 +229,31 @@
 
         if(!dataVal) return;
         
+        // Verifica o dia da semana (0: Dom, 1: Seg, 2: Ter, 3: Qua, 4: Qui, 5: Sex, 6: Sáb)
         const dataObj = new Date(dataVal + 'T12:00:00');
-        const eBloqueadoDia = [0, 5, 6].includes(dataObj.getDay());
+        const diaSemana = dataObj.getDay(); 
+
+        // BLOQUEIO: Se for Sexta (5), Sábado (6) ou Domingo (0)
+        if (diaSemana === 5 || diaSemana === 6 || diaSemana === 0) {
+            alert("⚠️ Reservas disponíveis apenas de Segunda a Quinta-feira.");
+            campoData.value = ""; // Limpa a data selecionada
+            btn.disabled = true;
+            btn.innerHTML = 'RESERVAS: SEG A QUI';
+            painelBolo.style.display = 'none';
+            return;
+        }
 
         let eBloqueadoHora = false;
         if(horaVal) {
             const [h, m] = horaVal.split(':').map(Number);
             const totalMinutos = h * 60 + m;
+            // 12:00 (720 min) até 21:30 (1290 min)
             if(totalMinutos < 720 || totalMinutos > 1290) eBloqueadoHora = true;
         }
 
-        if(eBloqueadoDia || eBloqueadoHora) {
+        if(eBloqueadoHora) {
             btn.disabled = true;
-            btn.innerHTML = eBloqueadoDia ? 'RESERVAS: SEG A QUI' : 'HORÁRIO: 12H ÀS 21:30';
+            btn.innerHTML = 'HORÁRIO: 12H ÀS 21:30';
             painelBolo.style.display = 'none';
         } else {
             btn.disabled = false;
@@ -253,7 +267,6 @@
                     painelBolo.className = 'secao-bolo modo-cortesia';
                     badge.innerText = '🎁 1kg Cortesia Aplicado';
                     badge.className = 'badge badge-cortesia';
-                    // Calcula apenas o excedente (Ex: 2kg - 1kg cortesia = 1kg cobrado)
                     total = Math.max(0, (kg - 1) * VALOR_KG);
                 } else {
                     painelBolo.className = 'secao-bolo modo-encomenda';
@@ -280,7 +293,7 @@
         const pessoas = parseInt(document.getElementById('pessoas').value);
         const querBolo = document.getElementById('querBolo').value;
         
-        if(!nome || !dataRaw || !horario || !pessoas) return alert("Preencha tudo!");
+        if(!nome || !dataRaw || !horario || !pessoas) return alert("Por favor, preencha todos os campos!");
 
         const dataBr = dataRaw.split('-').reverse().join('/');
         let texto = `*RESERVA - NOSSA CARNE*\n\n👤 *Cliente:* ${nome}\n📅 *Data:* ${dataBr}\n⏰ *Hora:* ${horario}\n👥 *Pessoas:* ${pessoas}\n⚠️ _Ciente da taxa de rolha (R$40)._`;
