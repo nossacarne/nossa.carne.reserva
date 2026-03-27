@@ -15,53 +15,19 @@
         body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100%; }
         .hidden { display: none !important; }
         
-        /* PORTAL INICIAL CORRIGIDO */
         #portal {
             height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
             background-size: cover; background-position: center; text-align: center; padding: 20px;
         }
 
-        /* Limita o tamanho da logo para não quebrar o layout */
-        .logo-main { 
-            width: 180px; 
-            max-width: 80%; 
-            margin-bottom: 20px; 
-            border-radius: 20px; 
-            border: 2px solid var(--gold);
-            background: #fff; /* Garante fundo branco se a imagem for transparente */
-        }
-
-        .portal-title { 
-            font-family: 'Montserrat', sans-serif; 
-            font-size: 22px; 
-            color: #fff; 
-            margin-bottom: 30px; 
-            border-bottom: 2px solid var(--gold); 
-            padding-bottom: 8px; 
-            font-style: italic; 
-        }
+        .logo-main { width: 180px; max-width: 80%; margin-bottom: 20px; border-radius: 20px; border: 2px solid var(--gold); background: #fff; }
+        .portal-title { font-family: 'Montserrat', sans-serif; font-size: 22px; color: #fff; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 8px; font-style: italic; }
         
-        .btn-portal { 
-            width: 90%; 
-            max-width: 320px; 
-            padding: 18px; 
-            margin: 10px; 
-            border-radius: 15px; 
-            font-size: 15px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            border: none; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            text-transform: uppercase;
-        }
+        .btn-portal { width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
         .btn-c { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); }
         .btn-l { background: #333; color: #fff; border: 1px solid #444; }
 
-        /* ÁREA CLIENTE */
         #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; width: 100%; padding: 70px 15px 30px; display: flex; flex-direction: column; align-items: center; }
         .card-cliente { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: 0 auto; }
         .regras-box { background: #fff5f5; border-left: 5px solid var(--primary); padding: 15px; border-radius: 12px; font-size: 11px; margin-bottom: 20px; line-height: 1.6; }
@@ -80,11 +46,9 @@
 
         .btn-home { position: fixed; top: 15px; left: 15px; z-index: 2000; background: #000; color: #fff; padding: 10px 18px; border-radius: 25px; border: none; font-size: 12px; cursor: pointer; }
 
-        /* ADM */
         #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; width: 100%; padding: 70px 15px; }
         .reserva-card-adm { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; }
 
-        /* CSS DE IMPRESSÃO CORRIGIDO */
         #printArea { display: none; }
         @media print {
             body * { display: none !important; }
@@ -110,9 +74,9 @@
             <div class="regras-box">
                 <b>REGRAS DA CASA:</b><br>
                 • <b>Dias:</b> Seg a Qui (12h às 21:30).<br>
-                • <b>Bolo Casa:</b> 10+ pessoas ganha 1kg grátis.<br>
+                • <b>Bolo Casa:</b> 10+ pessoas ganha 1kg grátis. Excedente R$ 95/kg.<br>
                 • <b>Rolha:</b> <b>R$ 40,00</b> (bebidas/bolos externos).<br>
-                • <b>Sinal:</b> 50% do valor da encomenda do bolo.
+                • <b>Sinal:</b> 50% do valor da encomenda ou se exceder o kg da cortesia.
             </div>
 
             <label>Nome Completo</label>
@@ -207,7 +171,7 @@
                 valorSinalGlobal = (kgPago * VALOR_KG) / 2;
                 if (valorSinalGlobal > 0) {
                     pixPanel.classList.remove('hidden'); cortesiaMsg.classList.add('hidden');
-                    document.getElementById('valorInfo').innerHTML = `Sinal 50%: R$ ${valorSinalGlobal.toFixed(2)}`;
+                    document.getElementById('valorInfo').innerHTML = `50% do valor da encomenda ou se exceder o kg: <br> R$ ${valorSinalGlobal.toFixed(2)}`;
                     sinalExigido = !sinalOk;
                 } else { pixPanel.classList.add('hidden'); cortesiaMsg.classList.remove('hidden'); sinalExigido = false; }
             } else { document.getElementById('secaoBolo').classList.add('hidden'); valorSinalGlobal = 0; }
