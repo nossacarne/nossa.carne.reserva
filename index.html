@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+13791998000131<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nossa Carne | Sistema Integrado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Nossa Carne | Sistema de Reservas</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
@@ -12,58 +12,77 @@
     <style>
         :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: #000; color: #fff; }
+        body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; }
         .hidden { display: none !important; }
         
-        #portal { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png'); background-size: cover; text-align: center; }
+        /* --- PORTAL INICIAL --- */
+        #portal {
+            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
+            background-size: cover; background-position: center; text-align: center; padding: 20px;
+        }
         .logo-main { width: 140px; margin-bottom: 10px; }
-        .btn-portal { width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; transition: 0.3s; }
-        .btn-c { background: var(--primary); color: white; border: 1px solid #e74c3c; }
+        .btn-portal {
+            width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px;
+            font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; transition: 0.3s;
+        }
+        .btn-c { background: var(--primary); color: white; border: 1px solid #e74c3c; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); }
         .btn-l { background: #333; color: #aaa; border: 1px solid #444; }
 
-        #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; padding: 60px 15px; }
+        /* --- ÁREA DO CLIENTE --- */
+        #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; padding: 70px 15px 30px; }
         .card-cliente { background: white; border-radius: 25px; padding: 25px; max-width: 480px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .regra-tag { background: #fff5f5; border-left: 4px solid var(--primary); padding: 10px; border-radius: 8px; font-size: 11px; margin-bottom: 20px; }
-        label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; }
+        .regras-box { background: #fff5f5; border-left: 5px solid var(--primary); padding: 15px; border-radius: 10px; font-size: 11px; margin-bottom: 20px; line-height: 1.6; }
+        label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; color: #2d3436; }
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; outline: none; }
         
-        .pix-box { background: #fff9db; border: 1px solid #f59f00; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; color: #856404; }
-        .btn-confirmar-pix { background: var(--ios-blue); color: white; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        .btn-enviar-final { width: 100%; padding: 18px; background: var(--success); color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-enviar-final:disabled { background: #ccc; cursor: not-allowed; }
+        .pix-box { background: #f0f3ff; border: 2px dashed var(--ios-blue); padding: 20px; border-radius: 20px; text-align: center; margin-top: 15px; color: #1c1c1e; }
+        .btn-enviar-final { width: 100%; padding: 18px; background: var(--success); color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
+        .btn-enviar-final:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
 
-        #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; padding: 70px 15px; }
-        .ios-card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        /* --- ÁREA ADM (iOS) --- */
+        #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; padding: 70px 15px; font-family: 'Montserrat', sans-serif; }
+        .ios-card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        .ios-header { padding: 20px; border-bottom: 1px solid #C6C6C8; display: flex; justify-content: space-between; align-items: center; }
         .item-reserva { background: #fff; border-bottom: 1px solid #eee; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-home { position: fixed; top: 15px; left: 15px; z-index: 2000; background: rgba(0,0,0,0.7); color: #fff; padding: 10px 18px; border-radius: 25px; font-size: 12px; cursor: pointer; font-weight: bold; }
         
-        .btn-home { position: fixed; top: 15px; left: 15px; z-index: 1000; background: #000; color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold; }
-        @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 100%; font-family: monospace; padding: 20px; } }
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; font-family: monospace; padding: 20px; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
 
     <div id="portal">
         <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main">
-        <div style="font-family: Montserrat; font-style: italic; border-bottom: 1px solid var(--gold); margin-bottom: 30px;">Reservas & Monitoramento</div>
-        <button class="btn-portal btn-c" onclick="ir('cliente')"><i class="fas fa-utensils"></i> RESERVAR MESA</button>
-        <button class="btn-portal btn-l" onclick="ir('loja')"><i class="fas fa-lock"></i> PAINEL DA LOJA</button>
+        <div style="font-family: Montserrat; color:white; border-bottom: 2px solid var(--gold); padding-bottom: 5px; margin-bottom: 35px; font-size: 18px; font-style: italic;">Portal de Reservas & Gestão</div>
+        <button class="btn-portal btn-c" onclick="ir('cliente')"><i class="fas fa-utensils"></i> ÁREA DO CLIENTE</button>
+        <button class="btn-portal btn-l" onclick="ir('loja')"><i class="fas fa-lock"></i> PAINEL DA LOJA (ADM)</button>
     </div>
 
-    <div id="btnHome" class="btn-home hidden" onclick="location.reload()">VOLTAR</div>
+    <button id="btnHome" class="btn-home hidden" onclick="location.reload()">VOLTAR</button>
 
     <div id="view-cliente" class="hidden">
         <div class="card-cliente">
-            <h3 style="text-align:center; margin:0; color:var(--primary)">Solicitar Reserva</h3>
-            <div class="regra-tag">
-                • <b>Datas:</b> Seg a Qui (Exceto Feriados/Vésperas).<br>
-                • <b>Bolo:</b> 10+ pessoas ganha 1kg (Excedente R$ 95/kg).<br>
-                • <b>Sinal:</b> 50% do valor excedente obrigatório.
+            <center>
+                <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="80" style="border-radius:50%; border: 2px solid var(--primary);">
+                <h3 style="margin:10px 0; color:var(--primary)">Nova Reserva</h3>
+            </center>
+            
+            <div class="regras-box">
+                • <b>Seg a Qui:</b> 12h às 21:30.<br>
+                • <b>10+ Pessoas:</b> 1kg Bolo Cortesia (Adicional R$ 95/kg).<br>
+                • <b>Sinal:</b> 50% obrigatório via PIX.<br>
+                • <b>Bloqueio:</b> Fins de Semana, Feriados e Vésperas.
             </div>
 
-            <label>Seu Nome</label>
-            <input type="text" id="c_nome" placeholder="Nome Completo">
-            
+            <label>Nome Completo</label>
+            <input type="text" id="c_nome" placeholder="Seu Nome">
+
             <label>WhatsApp</label>
             <input type="tel" id="c_tel" placeholder="(11) 99999-9999">
 
@@ -84,42 +103,44 @@
             <div id="secaoBolo" class="hidden">
                 <label>Peso do Bolo (Kg)</label>
                 <input type="number" id="c_kg" value="1" min="1" step="0.5" oninput="calc()">
-                
+
                 <div id="painelFinanceiro" class="pix-box">
-                    <div id="qrPlace"></div>
-                    <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 14px;"></div>
-                    <small>Chave CNPJ: 13.791.998/0001-31</small>
-                    <button class="btn-confirmar-pix" id="btnConfirmar" onclick="confirmarPix()">CONFIRMAR PAGAMENTO DO SINAL</button>
+                    <img id="qrCode" src="" width="150">
+                    <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 15px; color:var(--primary)"></div>
+                    <small style="display:block; margin-bottom:5px;">CNPJ: 13.791.998/0001-31</small>
+                    <button onclick="copiarPix()" style="padding:5px 10px; border-radius:8px; border:1px solid #ccc; font-size:10px; cursor:pointer; font-weight:bold;">COPIAR CNPJ</button>
+                    <div style="font-size: 10px; color: #d35400; margin-top: 10px;">⚠️ Confirmação do comprovante em até 10 min.</div>
+                    <button id="btnConfSinal" onclick="confirmarSinal()" style="margin-top:10px; width:100%; padding:12px; background:var(--ios-blue); border:none; color:#fff; border-radius:12px; font-weight:bold; cursor:pointer;">JÁ PAGUEI O SINAL</button>
                 </div>
             </div>
 
-            <button class="btn-enviar-final" id="btnWhatsApp" onclick="enviar()" disabled>
+            <button id="btnWhatsApp" class="btn-enviar-final" onclick="enviar()" disabled>
                 <i class="fab fa-whatsapp"></i> CONCLUIR NO WHATSAPP
             </button>
-            <p id="msgTrava" style="font-size:10px; text-align:center; color:gray; margin-top:5px;">O botão será liberado após a confirmação do sinal.</p>
         </div>
     </div>
 
     <div id="view-loja" class="hidden">
         <div class="ios-card">
-            <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+            <div class="ios-header">
                 <h3 style="margin:0">Monitor de Reservas</h3>
-                <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="40">
+                <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="40" style="border-radius:50%">
             </div>
             <div id="listaAdm"></div>
         </div>
     </div>
 
-    <div id="printArea"></div>
+    <div id="printArea" class="hidden"></div>
 
     <script>
-        const FERIADOS_26 = ["2026-01-01", "2026-02-16", "2026-02-17", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", "2026-07-09", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25"];
+        const PIX_KEY = "13791998000131";
+        const FERIADOS = ["2026-01-01", "2026-02-16", "2026-02-17", "2026-04-03", "2026-04-21", "2026-05-01", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-20", "2026-12-25"];
         const VALOR_KG = 95.00;
-        let db = JSON.parse(localStorage.getItem('nc_v3')) || [];
-        let pixConfirmado = false;
+        let db = JSON.parse(localStorage.getItem('nc_final_db')) || [];
+        let sinalOk = false;
 
         function ir(v) {
-            if(v === 'loja' && prompt("Senha:") !== "9002") return;
+            if(v === 'loja' && prompt("Senha ADM:") !== "9002") return;
             document.getElementById('portal').classList.add('hidden');
             document.getElementById('btnHome').classList.remove('hidden');
             document.getElementById('view-'+v).classList.remove('hidden');
@@ -127,16 +148,16 @@
         }
 
         function bloquearDatas() {
-            const dataInput = document.getElementById('c_data');
-            const dataObj = new Date(dataInput.value + "T12:00:00");
+            const input = document.getElementById('c_data');
+            const dataObj = new Date(input.value + "T12:00:00");
             const dia = dataObj.getDay(); 
             const amanha = new Date(dataObj);
             amanha.setDate(amanha.getDate() + 1);
             const amanhaStr = amanha.toISOString().split('T')[0];
 
-            if(dia === 0 || dia === 6 || FERIADOS_26.includes(dataInput.value) || FERIADOS_26.includes(amanhaStr)) {
-                alert("⚠️ DATA BLOQUEADA!\nReservas indisponíveis em feriados, vésperas ou fins de semana.");
-                dataInput.value = "";
+            if(dia === 0 || dia === 6 || FERIADOS.includes(input.value) || FERIADOS.includes(amanhaStr)) {
+                alert("⚠️ DATA BLOQUEADA! Reservas indisponíveis em feriados, vésperas ou fins de semana.");
+                input.value = "";
             }
             calc();
         }
@@ -145,64 +166,60 @@
             const bolo = document.getElementById('c_bolo').value;
             const qtd = parseInt(document.getElementById('c_qtd').value) || 0;
             const kg = parseFloat(document.getElementById('c_kg').value) || 0;
-            const secao = document.getElementById('secaoBolo');
             const btn = document.getElementById('btnWhatsApp');
-            const trava = document.getElementById('msgTrava');
-
+            
             if(bolo === 'sim') {
-                secao.classList.remove('hidden');
+                document.getElementById('secaoBolo').classList.remove('hidden');
                 let kgCobrado = (qtd >= 10) ? Math.max(0, kg - 1) : kg;
-                let totalSinal = (kgCobrado * VALOR_KG) / 2;
+                let sinal = (kgCobrado * VALOR_KG) / 2;
 
-                document.getElementById('qrPlace').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=13791998000131" width="150">`;
+                document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${PIX_KEY}`;
+                document.getElementById('valorInfo').innerText = sinal <= 0 ? "Bolo Cortesia Ativado!" : `Sinal de 50%: R$ ${sinal.toFixed(2)}`;
                 
-                let infoText = (qtd >= 10 && kg <= 1) ? "Bolo Cortesia (1kg) Ativo!" : `Sinal de 50%: R$ ${totalSinal.toFixed(2)}`;
-                document.getElementById('valorInfo').innerText = infoText;
-
-                if(totalSinal > 0 && !pixConfirmado) {
-                    btn.disabled = true;
-                    trava.classList.remove('hidden');
-                } else {
-                    btn.disabled = false;
-                    trava.classList.add('hidden');
-                }
+                btn.disabled = (sinal > 0 && !sinalOk);
             } else {
-                secao.classList.add('hidden');
+                document.getElementById('secaoBolo').classList.add('hidden');
                 btn.disabled = false;
-                trava.classList.add('hidden');
             }
         }
 
-        function confirmarPix() {
-            pixConfirmado = true;
-            document.getElementById('btnConfirmar').innerText = "PAGAMENTO CONFIRMADO ✅";
-            document.getElementById('btnConfirmar').style.background = "#27ae60";
+        function confirmarSinal() {
+            sinalOk = true;
+            document.getElementById('btnConfSinal').innerText = "SINAL INFORMADO ✅";
+            document.getElementById('btnConfSinal').style.background = "#27ae60";
             calc();
         }
 
+        function copiarPix() { navigator.clipboard.writeText(PIX_KEY); alert("CNPJ Copiado!"); }
+
         function enviar() {
-            const n = document.getElementById('c_nome').value, t = document.getElementById('c_tel').value, d = document.getElementById('c_data').value;
-            if(!n || !t || !d) return alert("Preencha todos os campos!");
-
-            const res = { id: Date.now(), nome: n, tel: t.replace(/\D/g,''), data: d, hora: document.getElementById('c_hora').value, qtd: document.getElementById('c_qtd').value, bolo: document.getElementById('c_bolo').value, kg: document.getElementById('c_kg').value };
+            const res = {
+                id: Date.now(),
+                nome: document.getElementById('c_nome').value,
+                tel: document.getElementById('c_tel').value.replace(/\D/g,''),
+                data: document.getElementById('c_data').value,
+                hora: document.getElementById('c_hora').value,
+                qtd: document.getElementById('c_qtd').value,
+                bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não'
+            };
             db.push(res);
-            localStorage.setItem('nc_v3', JSON.stringify(db));
+            localStorage.setItem('nc_final_db', JSON.stringify(db));
 
-            const msg = `*NOVA RESERVA - NOSSA CARNE*\n👤 Cliente: ${n}\n📅 Data: ${d}\n⏰ Hora: ${res.hora}\n👥 Pessoas: ${res.qtd}\n🎂 Bolo: ${res.bolo === 'sim' ? res.kg + 'kg' : 'Não'}\n💰 Sinal: Confirmado via Site`;
+            const msg = `*RESERVA NOSSA CARNE*\n👤 Cliente: ${res.nome}\n📅 Data: ${res.data}\n⏰ Hora: ${res.hora}\n👥 Pessoas: ${res.qtd}\n🎂 Bolo: ${res.bolo}\n💰 *Sinal Pago (Aguardando 10min)*`;
             window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msg)}`);
         }
 
         function renderAdm() {
             const list = document.getElementById('listaAdm');
-            list.innerHTML = db.length ? "" : "<p style='padding:20px; color:gray'>Nenhuma reserva.</p>";
+            list.innerHTML = db.length ? "" : "<p style='padding:20px; color:gray'>Sem reservas.</p>";
             db.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(r => {
                 list.innerHTML += `
                     <div class="item-reserva">
-                        <div><b>${r.nome}</b><br><small>${r.data.split('-').reverse().join('/')} | ${r.hora}</small></div>
-                        <div>
-                            <button class="btn-whats-adm" style="background:#25d366; color:white; border:none; padding:8px; border-radius:10px;" onclick="window.open('https://wa.me/55${r.tel}')"><i class="fab fa-whatsapp"></i></button>
-                            <button style="background:var(--ios-blue); color:white; border:none; padding:8px; border-radius:10px;" onclick="imprimir('${r.id}')"><i class="fas fa-print"></i></button>
-                            <button style="background:#eee; color:red; border:none; padding:8px; border-radius:10px;" onclick="apagar('${r.id}')"><i class="fas fa-trash"></i></button>
+                        <div><b>${r.nome}</b><br><small>${r.data} | ${r.hora}</small></div>
+                        <div style="display:flex">
+                            <button style="background:#25d366; color:white; border:none; padding:8px; border-radius:10px;" onclick="window.open('https://wa.me/55${r.tel}')"><i class="fab fa-whatsapp"></i></button>
+                            <button style="background:var(--ios-blue); color:white; border:none; padding:8px; border-radius:10px; margin-left:5px" onclick="imprimir('${r.id}')"><i class="fas fa-print"></i></button>
+                            <button style="background:none; border:none; color:red; margin-left:10px;" onclick="apagar('${r.id}')"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>`;
             });
@@ -210,11 +227,15 @@
 
         function imprimir(id) {
             const r = db.find(x => x.id == id);
-            document.getElementById('printArea').innerHTML = `<center><img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="50"><h3>NOSSA CARNE</h3></center><hr><p><b>CLIENTE:</b> ${r.nome}</p><p><b>DATA:</b> ${r.data}</p><p><b>HORA:</b> ${r.hora}</p><p><b>BOLO:</b> ${r.bolo === 'sim' ? r.kg + 'kg' : 'Não'}</p><p><b>TEL:</b> ${r.tel}</p><hr><center><small>${new Date().toLocaleString()}</small></center>`;
+            document.getElementById('printArea').innerHTML = `
+                <center><img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="50">
+                <h3>NOSSA CARNE - RESERVA</h3></center>
+                <hr><p><b>CLIENTE:</b> ${r.nome}</p><p><b>DATA/HORA:</b> ${r.data} às ${r.hora}</p><p><b>PESSOAS:</b> ${r.qtd}</p><p><b>BOLO:</b> ${r.bolo}</p><p><b>WHATS:</b> ${r.tel}</p><hr>
+                <center><small>Verificar sinal no extrato</small></center>`;
             window.print();
         }
 
-        function apagar(id) { if(confirm("Remover?")) { db = db.filter(x => x.id != id); localStorage.setItem('nc_v3', JSON.stringify(db)); renderAdm(); } }
+        function apagar(id) { if(confirm("Remover?")) { db = db.filter(x => x.id != id); localStorage.setItem('nc_final_db', JSON.stringify(db)); renderAdm(); } }
     </script>
 </body>
 </html>
