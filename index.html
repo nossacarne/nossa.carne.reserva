@@ -74,8 +74,8 @@
             <div class="regras-box">
                 <b>REGRAS DA CASA:</b><br>
                 • <b>Mínimo:</b> Reservas apenas a partir de <b>10 pessoas</b>.<br>
-                • <b>Dias:</b> Seg a Qui (12h às 21:30).<br>
-                • <b>Bloqueio:</b> Não reservamos feriados ou finais de semana.<br>
+                • <b>Horário:</b> Disponível apenas das <b>12h às 21:30</b>.<br>
+                • <b>Dias:</b> Seg a Qui. Não reservamos feriados ou finais de semana.<br>
                 • <b>Bolo Casa:</b> 10+ pessoas ganha 1kg grátis. Excedente R$ 95/kg.<br>
                 • <b>Rolha:</b> <b>R$ 40,00</b> (bebidas/bolos externos).<br>
                 • <b>Sinal:</b> 50% do valor da encomenda ou se exceder o kg da cortesia.
@@ -89,7 +89,7 @@
             <input type="date" id="c_data" onchange="validarData()">
 
             <div class="grid-mobile">
-                <div><label>Hora</label><input type="time" id="c_hora"></div>
+                <div><label>Hora</label><input type="time" id="c_hora" onchange="validarHora()"></div>
                 <div><label>Pessoas (Mín. 10)</label><input type="number" id="c_qtd" value="10" min="10" oninput="calc()"></div>
             </div>
 
@@ -162,12 +162,22 @@
             const input = document.getElementById('c_data');
             const dataVal = input.value;
             if(!dataVal) return;
-            
             const dataObj = new Date(dataVal + "T12:00:00");
-            const diaSemana = dataObj.getDay(); // 0: Dom, 6: Sab
+            const diaSemana = dataObj.getDay(); 
 
             if(diaSemana === 0 || diaSemana === 6 || FERIADOS.includes(dataVal)) {
                 alert("⚠️ DATA BLOQUEADA!\nReservas permitidas apenas de Segunda a Quinta, exceto feriados.");
+                input.value = "";
+            }
+            calc();
+        }
+
+        function validarHora() {
+            const input = document.getElementById('c_hora');
+            const hora = input.value;
+            if(!hora) return;
+            if(hora < "12:00" || hora > "21:30") {
+                alert("⚠️ HORÁRIO INDISPONÍVEL!\nReservas permitidas apenas das 12:00 às 21:30.");
                 input.value = "";
             }
             calc();
@@ -179,6 +189,7 @@
                   nome = document.getElementById('c_nome').value, 
                   tel = document.getElementById('c_tel').value, 
                   data = document.getElementById('c_data').value, 
+                  hora = document.getElementById('c_hora').value,
                   btn = document.getElementById('btnWhatsApp');
             
             let qtd = parseInt(qtdInput.value) || 0;
@@ -186,9 +197,8 @@
             const pixPanel = document.getElementById('painelFinanceiro'), cortesiaMsg = document.getElementById('msgCortesia');
             let sinalExigido = false;
 
-            // Bloqueio visual e lógico para menos de 10 pessoas
             if (qtd < 10 && qtdInput.value !== "") {
-                alert("Aceitamos reservas apenas a partir de 10 pessoas.");
+                alert("Mínimo de 10 pessoas para reserva.");
                 qtdInput.value = 10;
                 qtd = 10;
             }
@@ -199,12 +209,12 @@
                 valorSinalGlobal = (kgPago * VALOR_KG) / 2;
                 if (valorSinalGlobal > 0) {
                     pixPanel.classList.remove('hidden'); cortesiaMsg.classList.add('hidden');
-                    document.getElementById('valorInfo').innerHTML = `50% da encomenda ou excesso do kg: <br> R$ ${valorSinalGlobal.toFixed(2)}`;
+                    document.getElementById('valorInfo').innerHTML = `Sinal 50% encomenda/excesso: <br> R$ ${valorSinalGlobal.toFixed(2)}`;
                     sinalExigido = !sinalOk;
                 } else { pixPanel.classList.add('hidden'); cortesiaMsg.classList.remove('hidden'); sinalExigido = false; }
             } else { document.getElementById('secaoBolo').classList.add('hidden'); valorSinalGlobal = 0; }
             
-            btn.disabled = !(nome.length > 3 && tel.length > 8 && data !== "" && qtd >= 10 && !sinalExigido);
+            btn.disabled = !(nome.length > 3 && tel.length > 8 && data !== "" && hora !== "" && qtd >= 10 && !sinalExigido);
         }
 
         function copiarPix() { navigator.clipboard.writeText(PIX_STRING); alert("Pix Copiado!"); }
