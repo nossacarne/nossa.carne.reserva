@@ -2,319 +2,219 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Nossa Carne | Portal de Reservas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nossa Carne | Sistema Integrado</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary: #c0392b;
-            --gold: #d4af37;
-            --ios-blue: #007AFF;
-            --ios-bg: #F2F2F7;
-            --bg-overlay: rgba(0, 0, 0, 0.9);
-        }
-
+        :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; }
+        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: #000; color: #fff; }
         .hidden { display: none !important; }
         
-        /* --- PORTAL INICIAL (CONFORME IMAGEM) --- */
-        #portal {
-            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
-                        url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
-            background-size: cover; background-position: center; text-align: center; padding: 20px;
-        }
-        .logo-main { width: 130px; margin-bottom: 10px; }
-        .portal-title { font-family: 'Montserrat', sans-serif; font-size: 18px; color: #fff; margin-bottom: 35px; border-bottom: 2px solid var(--gold); padding-bottom: 5px; font-style: italic; }
+        #portal { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png'); background-size: cover; text-align: center; }
+        .logo-main { width: 140px; margin-bottom: 10px; }
+        .btn-portal { width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; transition: 0.3s; }
+        .btn-c { background: var(--primary); color: white; border: 1px solid #e74c3c; }
+        .btn-l { background: #333; color: #aaa; border: 1px solid #444; }
+
+        #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; padding: 60px 15px; }
+        .card-cliente { background: white; border-radius: 25px; padding: 25px; max-width: 480px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .regra-tag { background: #fff5f5; border-left: 4px solid var(--primary); padding: 10px; border-radius: 8px; font-size: 11px; margin-bottom: 20px; }
+        label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; outline: none; }
         
-        .btn-portal {
-            width: 100%; max-width: 320px; padding: 18px; margin: 10px 0; border: none; border-radius: 15px;
-            font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; justify-content: center; gap: 15px; text-transform: uppercase;
-        }
-        .btn-c { background: linear-gradient(145deg, #c0392b, #8e271c); color: white; border: 1px solid #e74c3c; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); }
-        .btn-l { background: linear-gradient(145deg, #444, #222); color: #ccc; border: 1px solid #555; }
-
-        /* --- ÁREA DO CLIENTE --- */
-        #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; padding: 70px 15px 30px; }
-        .card-cliente { background: white; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 480px; margin: 0 auto; }
-        .regras { background: #fff5f5; border-left: 4px solid var(--primary); padding: 12px; border-radius: 10px; font-size: 11px; margin-bottom: 20px; }
-        .campo { margin-bottom: 15px; }
-        .input-group { position: relative; display: flex; align-items: center; }
-        .input-group i { position: absolute; left: 15px; color: #a0a0a0; font-size: 16px; }
-        .input-group input, .input-group select { padding-left: 45px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-family: inherit; outline: none; }
+        .pix-box { background: #fff9db; border: 1px solid #f59f00; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; color: #856404; }
+        .btn-confirmar-pix { background: var(--ios-blue); color: white; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        /* ÁREA PIX AUTOMATIZADA */
-        .pix-panel { background: #f0f3ff; border: 2px dashed var(--ios-blue); padding: 20px; border-radius: 20px; text-align: center; margin-top: 15px; color: #1c1c1e; }
-        .qr-code { width: 160px; height: 160px; margin: 10px auto; background: #fff; padding: 8px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .btn-enviar-final { width: 100%; padding: 18px; background: var(--success); color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-enviar-final:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* --- ÁREA ADM (ESTILO iOS) --- */
-        #view-loja { background: var(--ios-bg); min-height: 100vh; padding-top: 60px; color: #000; font-family: 'Montserrat', sans-serif; }
-        .ios-card { background: white; max-width: 600px; margin: 0 auto; min-height: 100vh; border-radius: 30px 30px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
-        .ios-header { padding: 20px; border-bottom: 1px solid #C6C6C8; display: flex; justify-content: space-between; align-items: center; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 10px; background: #fff; }
-        .day { padding: 15px 5px; text-align: center; border-radius: 12px; cursor: pointer; font-size: 14px; position: relative; }
-        .day.selected { background: var(--ios-blue); color: white; font-weight: bold; }
-        .day.has-res::after { content: ''; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--gold); border-radius: 50%; }
+        #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; padding: 70px 15px; }
+        .ios-card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .item-reserva { background: #fff; border-bottom: 1px solid #eee; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         
-        .item-reserva { background: #fff; margin: 10px 15px; padding: 15px; border-radius: 18px; border: 1px solid #efefef; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .btn-action { background: var(--ios-bg); border: none; padding: 10px; border-radius: 12px; color: var(--ios-blue); cursor: pointer; font-size: 18px; }
-
-        .btn-home { position: fixed; top: 15px; left: 15px; z-index: 2000; background: #000; color: #fff; border: 1px solid #444; padding: 10px 18px; border-radius: 25px; font-size: 12px; cursor: pointer; font-weight: bold; }
-
-        @media print {
-            body * { visibility: hidden; }
-            #printArea, #printArea * { visibility: visible; }
-            #printArea { position: absolute; left: 0; top: 0; width: 100%; color: #000; font-family: 'Courier New', monospace; }
-        }
+        .btn-home { position: fixed; top: 15px; left: 15px; z-index: 1000; background: #000; color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 100%; font-family: monospace; padding: 20px; } }
     </style>
 </head>
 <body>
 
     <div id="portal">
         <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main">
-        <div class="portal-title">Portal Unificado de Reservas & Gestão</div>
-        
-        <button class="btn-portal btn-c" onclick="abrir('cliente')">
-            <i class="fas fa-utensils"></i> Área do Cliente - Reservar
-        </button>
-        
-        <button class="btn-portal btn-l" onclick="abrir('loja')">
-            <i class="fas fa-lock"></i> Painel da Loja - ADM
-        </button>
-
-        <div style="font-size: 9px; margin-top: 40px; opacity: 0.5;">© 2026 Nossa Carne - Todos os direitos reservados.</div>
+        <div style="font-family: Montserrat; font-style: italic; border-bottom: 1px solid var(--gold); margin-bottom: 30px;">Reservas & Monitoramento</div>
+        <button class="btn-portal btn-c" onclick="ir('cliente')"><i class="fas fa-utensils"></i> RESERVAR MESA</button>
+        <button class="btn-portal btn-l" onclick="ir('loja')"><i class="fas fa-lock"></i> PAINEL DA LOJA</button>
     </div>
 
-    <button id="btnHome" class="btn-home hidden" onclick="location.reload()">
-        <i class="fas fa-home"></i> INÍCIO
-    </button>
+    <div id="btnHome" class="btn-home hidden" onclick="location.reload()">VOLTAR</div>
 
     <div id="view-cliente" class="hidden">
         <div class="card-cliente">
-            <center><img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="70"></center>
-            <h2 style="text-align:center; margin: 10px 0; color:var(--primary)">Nova Reserva</h2>
+            <h3 style="text-align:center; margin:0; color:var(--primary)">Solicitar Reserva</h3>
+            <div class="regra-tag">
+                • <b>Datas:</b> Seg a Qui (Exceto Feriados/Vésperas).<br>
+                • <b>Bolo:</b> 10+ pessoas ganha 1kg (Excedente R$ 95/kg).<br>
+                • <b>Sinal:</b> 50% do valor excedente obrigatório.
+            </div>
+
+            <label>Seu Nome</label>
+            <input type="text" id="c_nome" placeholder="Nome Completo">
             
-            <div class="regras">
-                • <b>Seg a Qui:</b> 12h às 21:30.<br>
-                • <b>10+ Pessoas:</b> Cortesia 1kg (Excedente R$ 95,00/kg).<br>
-                • <b>Encomenda:</b> Sinal de 50% obrigatório via PIX.
+            <label>WhatsApp</label>
+            <input type="tel" id="c_tel" placeholder="(11) 99999-9999">
+
+            <label>Data</label>
+            <input type="date" id="c_data" onchange="bloquearDatas()">
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Hora</label><input type="time" id="c_hora"></div>
+                <div><label>Pessoas</label><input type="number" id="c_qtd" value="1" oninput="calc()"></div>
             </div>
 
-            <div class="campo">
-                <label>Nome do Cliente</label>
-                <div class="input-group"><i class="fas fa-user"></i><input type="text" id="c_nome" placeholder="Nome Completo"></div>
-            </div>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="campo"><label>Data</label><div class="input-group"><i class="fas fa-calendar"></i><input type="date" id="c_data" onchange="atualizarLote()"></div></div>
-                <div class="campo"><label>Hora</label><div class="input-group"><i class="fas fa-clock"></i><input type="time" id="c_hora"></div></div>
-            </div>
+            <label>Deseja Bolo?</label>
+            <select id="c_bolo" onchange="calc()">
+                <option value="nao">Não</option>
+                <option value="sim">Sim, desejo bolo 🎂</option>
+            </select>
 
-            <div class="campo">
-                <label>Pessoas na Mesa</label>
-                <div class="input-group"><i class="fas fa-users"></i><input type="number" id="c_qtd" placeholder="Quantidade" oninput="atualizarLote()"></div>
-            </div>
-
-            <div class="campo">
-                <label>Deseja Bolo?</label>
-                <div class="input-group"><i class="fas fa-birthday-cake"></i>
-                    <select id="c_bolo" onchange="atualizarLote()">
-                        <option value="nao">Não, apenas mesa</option>
-                        <option value="sim">Sim, desejo bolo 🎂</option>
-                    </select>
+            <div id="secaoBolo" class="hidden">
+                <label>Peso do Bolo (Kg)</label>
+                <input type="number" id="c_kg" value="1" min="1" step="0.5" oninput="calc()">
+                
+                <div id="painelFinanceiro" class="pix-box">
+                    <div id="qrPlace"></div>
+                    <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 14px;"></div>
+                    <small>Chave CNPJ: 13.791.998/0001-31</small>
+                    <button class="btn-confirmar-pix" id="btnConfirmar" onclick="confirmarPix()">CONFIRMAR PAGAMENTO DO SINAL</button>
                 </div>
             </div>
 
-            <div id="painelPix" class="pix-panel hidden">
-                <h4 style="margin:0; color:var(--ios-blue);" id="pixTitulo">Sinal de Encomenda</h4>
-                <div id="pixDesc" style="font-size:12px; margin: 5px 0;"></div>
-                <div id="qrPlace"></div>
-                <div style="font-weight:bold; font-size:14px;">Chave CNPJ: 13.791.998/0001-31</div>
-                <button onclick="copiarPix()" style="margin-top:10px; background:#fff; border:1px solid #ddd; padding:5px 10px; border-radius:10px; font-size:10px; font-weight:bold; cursor:pointer;">COPIAR CHAVE</button>
-            </div>
-
-            <button class="btn-enviar" onclick="finalizarCliente()">
-                <i class="fab fa-whatsapp"></i> CONCLUIR RESERVA NO WHATSAPP
+            <button class="btn-enviar-final" id="btnWhatsApp" onclick="enviar()" disabled>
+                <i class="fab fa-whatsapp"></i> CONCLUIR NO WHATSAPP
             </button>
+            <p id="msgTrava" style="font-size:10px; text-align:center; color:gray; margin-top:5px;">O botão será liberado após a confirmação do sinal.</p>
         </div>
     </div>
 
     <div id="view-loja" class="hidden">
         <div class="ios-card">
-            <div class="ios-header">
-                <div>
-                    <h3 style="margin:0; font-size:18px;">Calendário iOS</h3>
-                    <span id="labelMes" style="font-size:11px; font-weight:700; color:gray; text-transform:uppercase;"></span>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-action" onclick="mudarM(-1)"><i class="mdi mdi-chevron-left"></i></button>
-                    <button class="btn-action" onclick="mudarM(1)"><i class="mdi mdi-chevron-right"></i></button>
-                </div>
+            <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0">Monitor de Reservas</h3>
+                <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="40">
             </div>
-
-            <div class="calendar-grid" id="gridAdm"></div>
-
-            <div style="padding:20px;">
-                <h4 id="dataLabel" style="color:var(--ios-blue); font-size:15px; margin-bottom:15px;">Selecione um dia</h4>
-                <div id="listaRes"></div>
-
-                <div style="margin-top:30px; background:var(--ios-bg); padding:20px; border-radius:25px;">
-                    <h4 style="margin:0 0 15px; font-size:14px;"><i class="mdi mdi-account-plus"></i> Novo Registro (Manual/Whats)</h4>
-                    <div class="campo"><input type="text" id="adm_n" placeholder="Nome"></div>
-                    <div class="campo"><input type="tel" id="adm_t" placeholder="WhatsApp"></div>
-                    <textarea id="adm_obs" placeholder="Observações (Mesa, Preferências...)" style="margin-bottom:15px; height:60px;"></textarea>
-                    <button class="btn-portal btn-c" style="width:100%; background:var(--ios-blue); border:none; font-size:14px;" onclick="salvarAdm()">
-                        SALVAR E AUTOMATIZAR CONTATO
-                    </button>
-                </div>
-            </div>
+            <div id="listaAdm"></div>
         </div>
     </div>
 
-    <div id="printArea" class="hidden"></div>
+    <div id="printArea"></div>
 
     <script>
-        const PIX_KEY = "13791998000131";
-        const WHATS_LOJA = "5511967105333";
-        const PASS_LOJA = "9002";
-        let db = JSON.parse(localStorage.getItem('nc_db')) || [];
-        let contatos = JSON.parse(localStorage.getItem('nc_contatos')) || [];
-        let dataAtiva = "";
-        let mesRef = new Date();
+        const FERIADOS_26 = ["2026-01-01", "2026-02-16", "2026-02-17", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", "2026-07-09", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25"];
+        const VALOR_KG = 95.00;
+        let db = JSON.parse(localStorage.getItem('nc_v3')) || [];
+        let pixConfirmado = false;
 
-        // NAVEGAÇÃO
-        function abrir(v) {
-            if(v === 'loja' && prompt("Acesso ADM - Senha:") !== PASS_LOJA) return;
+        function ir(v) {
+            if(v === 'loja' && prompt("Senha:") !== "9002") return;
             document.getElementById('portal').classList.add('hidden');
             document.getElementById('btnHome').classList.remove('hidden');
-            document.getElementById('view-' + v).classList.remove('hidden');
-            if(v === 'loja') renderCal();
+            document.getElementById('view-'+v).classList.remove('hidden');
+            if(v === 'loja') renderAdm();
         }
 
-        // LÓGICA CLIENTE - PIX AUTOMATIZADO
-        function atualizarLote() {
-            const data = document.getElementById('c_data').value;
-            const qtd = parseInt(document.getElementById('c_qtd').value) || 0;
-            const bolo = document.getElementById('c_bolo').value;
-            const painel = document.getElementById('painelPix');
-            
-            if(data) {
-                const dia = new Date(data + 'T12:00:00').getDay();
-                if([5,6,0].includes(dia)) { alert("Atenção: Reservas de Segunda a Quinta!"); document.getElementById('c_data').value = ""; }
+        function bloquearDatas() {
+            const dataInput = document.getElementById('c_data');
+            const dataObj = new Date(dataInput.value + "T12:00:00");
+            const dia = dataObj.getDay(); 
+            const amanha = new Date(dataObj);
+            amanha.setDate(amanha.getDate() + 1);
+            const amanhaStr = amanha.toISOString().split('T')[0];
+
+            if(dia === 0 || dia === 6 || FERIADOS_26.includes(dataInput.value) || FERIADOS_26.includes(amanhaStr)) {
+                alert("⚠️ DATA BLOQUEADA!\nReservas indisponíveis em feriados, vésperas ou fins de semana.");
+                dataInput.value = "";
             }
+            calc();
+        }
+
+        function calc() {
+            const bolo = document.getElementById('c_bolo').value;
+            const qtd = parseInt(document.getElementById('c_qtd').value) || 0;
+            const kg = parseFloat(document.getElementById('c_kg').value) || 0;
+            const secao = document.getElementById('secaoBolo');
+            const btn = document.getElementById('btnWhatsApp');
+            const trava = document.getElementById('msgTrava');
 
             if(bolo === 'sim') {
-                painel.classList.remove('hidden');
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${PIX_KEY}`;
-                document.getElementById('qrPlace').innerHTML = `<img src="${qrUrl}" class="qr-code">`;
+                secao.classList.remove('hidden');
+                let kgCobrado = (qtd >= 10) ? Math.max(0, kg - 1) : kg;
+                let totalSinal = (kgCobrado * VALOR_KG) / 2;
+
+                document.getElementById('qrPlace').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=13791998000131" width="150">`;
                 
-                if(qtd >= 10) {
-                    document.getElementById('pixTitulo').innerText = "Adicional de Quilo Excedente";
-                    document.getElementById('pixDesc').innerText = "Você tem 1kg de Cortesia! Pague apenas se desejar mais quilos.";
+                let infoText = (qtd >= 10 && kg <= 1) ? "Bolo Cortesia (1kg) Ativo!" : `Sinal de 50%: R$ ${totalSinal.toFixed(2)}`;
+                document.getElementById('valorInfo').innerText = infoText;
+
+                if(totalSinal > 0 && !pixConfirmado) {
+                    btn.disabled = true;
+                    trava.classList.remove('hidden');
                 } else {
-                    document.getElementById('pixTitulo').innerText = "Sinal de Encomenda (50%)";
-                    document.getElementById('pixDesc').innerText = "Para encomendas particulares, solicitamos o sinal via PIX.";
+                    btn.disabled = false;
+                    trava.classList.add('hidden');
                 }
-            } else { painel.classList.add('hidden'); }
-        }
-
-        function finalizarCliente() {
-            const n = document.getElementById('c_nome').value;
-            const d = document.getElementById('c_data').value;
-            const h = document.getElementById('c_hora').value;
-            if(!n || !d || !h) return alert("Preencha Nome, Data e Hora!");
-
-            const msg = `*RESERVA NOSSA CARNE*\n👤 Cliente: ${n}\n📅 Data: ${d}\n⏰ Hora: ${h}\n👥 Pessoas: ${document.getElementById('c_qtd').value}\n🎂 Bolo: ${document.getElementById('c_bolo').value === 'sim' ? 'SIM' : 'NÃO'}`;
-            window.open(`https://wa.me/${WHATS_LOJA}?text=${encodeURIComponent(msg)}`);
-        }
-
-        // LÓGICA ADM - CALENDÁRIO E AUTOMAÇÃO
-        function renderCal() {
-            const g = document.getElementById('gridAdm');
-            g.innerHTML = "<div style='color:gray'>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div style='color:gray'>S</div>";
-            document.getElementById('labelMes').innerText = mesRef.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
-            
-            const a = mesRef.getFullYear(), m = mesRef.getMonth();
-            const s = new Date(a, m, 1).getDay();
-            const t = new Date(a, m + 1, 0).getDate();
-
-            for(let i=0; i<s; i++) g.innerHTML += "<div></div>";
-            for(let d=1; d<=t; d++) {
-                const f = `${a}-${(m+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-                const res = db.some(x => x.data === f);
-                g.innerHTML += `<div class="day ${res?'has-res':''} ${f===dataAtiva?'selected':''}" onclick="selectD('${f}')">${d}</div>`;
+            } else {
+                secao.classList.add('hidden');
+                btn.disabled = false;
+                trava.classList.add('hidden');
             }
         }
 
-        function selectD(f) {
-            dataAtiva = f;
-            document.getElementById('dataLabel').innerText = "Dia: " + f.split('-').reverse().join('/');
-            renderList(); renderCal();
+        function confirmarPix() {
+            pixConfirmado = true;
+            document.getElementById('btnConfirmar').innerText = "PAGAMENTO CONFIRMADO ✅";
+            document.getElementById('btnConfirmar').style.background = "#27ae60";
+            calc();
         }
 
-        function renderList() {
-            const l = document.getElementById('listaRes');
-            const filtrados = db.filter(x => x.data === dataAtiva);
-            l.innerHTML = filtrados.length ? "" : "<p style='font-size:12px; color:gray'>Sem registros.</p>";
-            filtrados.forEach(item => {
-                l.innerHTML += `
+        function enviar() {
+            const n = document.getElementById('c_nome').value, t = document.getElementById('c_tel').value, d = document.getElementById('c_data').value;
+            if(!n || !t || !d) return alert("Preencha todos os campos!");
+
+            const res = { id: Date.now(), nome: n, tel: t.replace(/\D/g,''), data: d, hora: document.getElementById('c_hora').value, qtd: document.getElementById('c_qtd').value, bolo: document.getElementById('c_bolo').value, kg: document.getElementById('c_kg').value };
+            db.push(res);
+            localStorage.setItem('nc_v3', JSON.stringify(db));
+
+            const msg = `*NOVA RESERVA - NOSSA CARNE*\n👤 Cliente: ${n}\n📅 Data: ${d}\n⏰ Hora: ${res.hora}\n👥 Pessoas: ${res.qtd}\n🎂 Bolo: ${res.bolo === 'sim' ? res.kg + 'kg' : 'Não'}\n💰 Sinal: Confirmado via Site`;
+            window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msg)}`);
+        }
+
+        function renderAdm() {
+            const list = document.getElementById('listaAdm');
+            list.innerHTML = db.length ? "" : "<p style='padding:20px; color:gray'>Nenhuma reserva.</p>";
+            db.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(r => {
+                list.innerHTML += `
                     <div class="item-reserva">
-                        <div><i class="mdi mdi-account" style="color:var(--ios-blue)"></i> <b>${item.nome}</b><br><small>${item.tel}</small></div>
-                        <div style="display:flex; gap:8px">
-                            <button class="btn-action" onclick="printR('${item.id}')"><i class="mdi mdi-printer"></i></button>
-                            <button class="btn-action" style="color:red" onclick="delR('${item.id}')"><i class="mdi mdi-trash-can-outline"></i></button>
+                        <div><b>${r.nome}</b><br><small>${r.data.split('-').reverse().join('/')} | ${r.hora}</small></div>
+                        <div>
+                            <button class="btn-whats-adm" style="background:#25d366; color:white; border:none; padding:8px; border-radius:10px;" onclick="window.open('https://wa.me/55${r.tel}')"><i class="fab fa-whatsapp"></i></button>
+                            <button style="background:var(--ios-blue); color:white; border:none; padding:8px; border-radius:10px;" onclick="imprimir('${r.id}')"><i class="fas fa-print"></i></button>
+                            <button style="background:#eee; color:red; border:none; padding:8px; border-radius:10px;" onclick="apagar('${r.id}')"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>`;
             });
         }
 
-        function salvarAdm() {
-            const n = document.getElementById('adm_n').value, t = document.getElementById('adm_t').value, o = document.getElementById('adm_obs').value;
-            if(!n || !dataAtiva) return alert("Selecione a data e nome!");
-
-            const novo = { id: Date.now(), data: dataAtiva, nome: n, tel: t, obs: o };
-            db.push(novo);
-            
-            // Automação: Salvar Contato se não existir
-            if(!contatos.some(c => c.tel === t)) {
-                contatos.push({nome: n, tel: t});
-                localStorage.setItem('nc_contatos', JSON.stringify(contatos));
-            }
-
-            localStorage.setItem('nc_db', JSON.stringify(db));
-            document.getElementById('adm_n').value = ""; document.getElementById('adm_t').value = ""; document.getElementById('adm_obs').value = "";
-            renderList(); renderCal();
-        }
-
-        function printR(id) {
+        function imprimir(id) {
             const r = db.find(x => x.id == id);
-            const p = document.getElementById('printArea');
-            p.innerHTML = `
-                <div style="text-align:center; margin-bottom:10px;">
-                    <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="60">
-                    <h3>COMANDA DE RESERVA</h3>
-                </div>
-                <hr>
-                <p><b>CLIENTE:</b> ${r.nome.toUpperCase()}</p>
-                <p><b>DATA:</b> ${r.data.split('-').reverse().join('/')}</p>
-                <p><b>CONTATO:</b> ${r.tel}</p>
-                <p><b>OBS:</b> ${r.obs || 'Nenhuma'}</p>
-                <hr>
-                <center><small>Nossa Carne - Excelência em Churrasco</small></center>
-            `;
+            document.getElementById('printArea').innerHTML = `<center><img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" width="50"><h3>NOSSA CARNE</h3></center><hr><p><b>CLIENTE:</b> ${r.nome}</p><p><b>DATA:</b> ${r.data}</p><p><b>HORA:</b> ${r.hora}</p><p><b>BOLO:</b> ${r.bolo === 'sim' ? r.kg + 'kg' : 'Não'}</p><p><b>TEL:</b> ${r.tel}</p><hr><center><small>${new Date().toLocaleString()}</small></center>`;
             window.print();
         }
 
-        function delR(id) { if(confirm("Remover reserva?")) { db = db.filter(x => x.id != id); localStorage.setItem('nc_db', JSON.stringify(db)); renderList(); renderCal(); } }
-        function mudarM(v) { mesRef.setMonth(mesRef.getMonth() + v); renderCal(); }
-        function copiarPix() { navigator.clipboard.writeText(PIX_KEY); alert("Chave PIX copiada!"); }
+        function apagar(id) { if(confirm("Remover?")) { db = db.filter(x => x.id != id); localStorage.setItem('nc_v3', JSON.stringify(db)); renderAdm(); } }
     </script>
 </body>
 </html>
