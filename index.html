@@ -15,18 +15,51 @@
         body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100%; }
         .hidden { display: none !important; }
         
-        /* PORTAL INICIAL */
+        /* PORTAL INICIAL CORRIGIDO */
         #portal {
             height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
             background-size: cover; background-position: center; text-align: center; padding: 20px;
         }
-        .logo-main { width: 150px; margin-bottom: 15px; border-radius: 50%; border: 2px solid var(--gold); }
-        .portal-title { font-family: 'Montserrat', sans-serif; font-size: 24px; color: #fff; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 8px; font-style: italic; }
+
+        /* Limita o tamanho da logo para não quebrar o layout */
+        .logo-main { 
+            width: 180px; 
+            max-width: 80%; 
+            margin-bottom: 20px; 
+            border-radius: 20px; 
+            border: 2px solid var(--gold);
+            background: #fff; /* Garante fundo branco se a imagem for transparente */
+        }
+
+        .portal-title { 
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 22px; 
+            color: #fff; 
+            margin-bottom: 30px; 
+            border-bottom: 2px solid var(--gold); 
+            padding-bottom: 8px; 
+            font-style: italic; 
+        }
         
-        .btn-portal { width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-c { background: var(--primary); color: white; }
-        .btn-l { background: #333; color: #aaa; }
+        .btn-portal { 
+            width: 90%; 
+            max-width: 320px; 
+            padding: 18px; 
+            margin: 10px; 
+            border-radius: 15px; 
+            font-size: 15px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            border: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            text-transform: uppercase;
+        }
+        .btn-c { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); }
+        .btn-l { background: #333; color: #fff; border: 1px solid #444; }
 
         /* ÁREA CLIENTE */
         #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; width: 100%; padding: 70px 15px 30px; display: flex; flex-direction: column; align-items: center; }
@@ -47,26 +80,16 @@
 
         .btn-home { position: fixed; top: 15px; left: 15px; z-index: 2000; background: #000; color: #fff; padding: 10px 18px; border-radius: 25px; border: none; font-size: 12px; cursor: pointer; }
 
-        /* ÁREA ADM */
+        /* ADM */
         #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; width: 100%; padding: 70px 15px; }
         .reserva-card-adm { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; }
 
-        /* CSS DE IMPRESSÃO - CORREÇÃO DEFINITIVA */
+        /* CSS DE IMPRESSÃO CORRIGIDO */
         #printArea { display: none; }
         @media print {
             body * { display: none !important; }
-            #printArea { 
-                display: block !important; 
-                width: 100% !important; 
-                height: auto !important;
-                color: #000 !important; 
-                background: #fff !important; 
-                font-family: 'Courier Prime', monospace !important; 
-                font-size: 16px !important;
-                margin: 0 !important;
-                padding: 10px !important;
-            }
-            #printArea * { display: block !important; color: #000 !important; }
+            #printArea { display: block !important; color: #000 !important; background: #fff !important; font-family: 'Courier Prime', monospace !important; padding: 20px; }
+            #printArea * { display: block !important; }
         }
     </style>
 </head>
@@ -205,56 +228,15 @@
             const list = document.getElementById('listaAdm');
             list.innerHTML = db.length ? "" : "<p>Vazio.</p>";
             db.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(r => {
-                list.innerHTML += `
-                    <div class="reserva-card-adm">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <b>${r.nome.toUpperCase()}</b>
-                            <div>
-                                <button onclick="imprimir('${r.id}')" style="background:var(--ios-blue); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;"><i class="fas fa-print"></i></button>
-                                <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; margin-left:15px; cursor:pointer;"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <div style="font-size:13px; margin-top:5px; color:#555">
-                            📅 ${r.data.split('-').reverse().join('/')} às ${r.hora}<br>
-                            👥 ${r.qtd} pessoas | 🎂 ${r.bolo}
-                        </div>
-                    </div>`;
+                list.innerHTML += `<div class="reserva-card-adm"><div style="display:flex; justify-content:space-between; align-items:center;"><b>${r.nome.toUpperCase()}</b><div><button onclick="imprimir('${r.id}')" style="background:var(--ios-blue); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;"><i class="fas fa-print"></i></button><button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; margin-left:15px; cursor:pointer;"><i class="fas fa-trash"></i></button></div></div><div style="font-size:13px; margin-top:5px; color:#555">📅 ${r.data.split('-').reverse().join('/')} às ${r.hora}<br>👥 ${r.qtd} pessoas | 🎂 ${r.bolo}</div></div>`;
             });
         }
 
         function imprimir(id) {
             const r = db.find(x => x.id == id);
             const area = document.getElementById('printArea');
-            
-            area.innerHTML = `
-                <div style="text-align:center;">
-                    <h1 style="margin-bottom:5px;">NOSSA CARNE</h1>
-                    <p style="margin-top:0;">CONTROLE DE RESERVA</p>
-                    <p>------------------------------------</p>
-                </div>
-                <div style="text-align:left; font-weight:bold;">
-                    <p>DATA: ${r.data.split('-').reverse().join('/')}</p>
-                    <p>HORA: ${r.hora}</p>
-                    <p>CLIENTE: ${r.nome.toUpperCase()}</p>
-                    <p>WHATSAPP: ${r.tel}</p>
-                    <p>PESSOAS: ${r.qtd}</p>
-                    <p>------------------------------------</p>
-                    <p>ENCOMENDA DE BOLO: ${r.bolo}</p>
-                    <p>SABOR: ${r.sabor || 'N/A'}</p>
-                    <p>SINAL PAGO: R$ ${r.sinal.toFixed(2)}</p>
-                    <p>------------------------------------</p>
-                </div>
-                <div style="text-align:center; margin-top:30px;">
-                    <p>__________________________________</p>
-                    <p>Assinatura Responsável</p>
-                    <p style="font-size:10px;">Emitido em: ${new Date().toLocaleString()}</p>
-                </div>
-            `;
-            
-            // Força o navegador a reconhecer o novo conteúdo antes de imprimir
-            setTimeout(() => {
-                window.print();
-            }, 600);
+            area.innerHTML = `<div style="text-align:center;"><h1>NOSSA CARNE</h1><p>RESERVA</p><hr><p>DATA: ${r.data.split('-').reverse().join('/')}</p><p>CLIENTE: ${r.nome.toUpperCase()}</p><p>PESSOAS: ${r.qtd}</p><p>BOLO: ${r.bolo}</p><p>SINAL PAGO: R$ ${r.sinal.toFixed(2)}</p><hr></div>`;
+            setTimeout(() => { window.print(); }, 600);
         }
 
         function apagar(id) { if(confirm("Remover?")) { db = db.filter(x => x.id != id); localStorage.setItem('nc_v3', JSON.stringify(db)); renderAdm(); } }
