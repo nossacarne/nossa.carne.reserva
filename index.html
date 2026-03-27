@@ -73,7 +73,7 @@
                 • <b>Dias:</b> Reservas de Segunda a Quinta (12h às 21:30).<br>
                 • <b>Bolo da Casa:</b> Grupos de 10+ pessoas ganham 1kg grátis. Excedente R$ 95/kg.<br>
                 • <b>Itens Externos:</b> Taxa de Rolha de <b>R$ 40,00</b> para bebidas ou bolos trazidos de fora.<br>
-                • <b>Sinal:</b> Obrigatório pagamento de 50% do valor da encomenda do bolo para validar a reserva.
+                • <b>Sinal:</b> Obrigatório pagamento de 50% do valor da encomenda do bolo (se exceder a cortesia).
             </div>
 
             <label>Nome Completo</label>
@@ -108,7 +108,7 @@
                 <label>Peso Total (Kg)</label>
                 <input type="number" id="c_kg" value="1" min="1" step="0.5" oninput="calc()">
 
-                <div id="painelFinanceiro" class="pix-box">
+                <div id="painelFinanceiro" class="pix-box hidden">
                     <p style="margin:0; font-weight:bold; color:#d35400;">PAGAMENTO DO SINAL</p>
                     <img id="qrCode" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9" width="140" style="margin:10px auto; border: 5px solid #fff; border-radius: 10px;">
                     
@@ -120,6 +120,9 @@
                     <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 15px; color:var(--primary); background: #fff; padding: 5px; border-radius: 5px;"></div>
                     
                     <button id="btnConfirmSinal" onclick="confirmarSinal()" style="width:100%; padding:15px; background:var(--ios-blue); border:none; color:#fff; border-radius:12px; font-weight:bold; cursor:pointer;">JÁ REALIZEI O PIX</button>
+                </div>
+                <div id="msgCortesia" class="hidden" style="text-align:center; padding:15px; color:#27ae60; font-weight:bold;">
+                    ✨ Bolo de 1kg Cortesia Ativado!
                 </div>
             </div>
 
@@ -167,6 +170,9 @@
 
         function calc() {
             const bolo = document.getElementById('c_bolo').value, qtd = parseInt(document.getElementById('c_qtd').value) || 0, kg = parseFloat(document.getElementById('c_kg').value) || 0, nome = document.getElementById('c_nome').value, tel = document.getElementById('c_tel').value, data = document.getElementById('c_data').value, btn = document.getElementById('btnWhatsApp');
+            
+            const pixPanel = document.getElementById('painelFinanceiro');
+            const cortesiaMsg = document.getElementById('msgCortesia');
             let sinalExigido = false;
             
             if(bolo === 'sim') {
@@ -175,10 +181,13 @@
                 valorSinalGlobal = (kgPago * VALOR_KG) / 2;
                 
                 if (valorSinalGlobal > 0) {
-                    document.getElementById('valorInfo').innerHTML = `50% do valor da encomenda do bolo: <br> R$ ${valorSinalGlobal.toFixed(2)}`;
+                    pixPanel.classList.remove('hidden');
+                    cortesiaMsg.classList.add('hidden');
+                    document.getElementById('valorInfo').innerHTML = `50% do valor da encomenda: <br> R$ ${valorSinalGlobal.toFixed(2)}`;
                     sinalExigido = !sinalOk;
                 } else {
-                    document.getElementById('valorInfo').innerText = "CORTESIA: 1kg Grátis";
+                    pixPanel.classList.add('hidden');
+                    cortesiaMsg.classList.remove('hidden');
                     sinalExigido = false;
                 }
             } else { 
