@@ -11,45 +11,82 @@
     <style>
         :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100vw; }
+        
+        body { 
+            margin: 0; padding: 0; min-height: 100vh; 
+            font-family: 'Poppins', sans-serif; background: #000; color: #fff; 
+            overflow-x: hidden; width: 100%;
+        }
+
         .hidden { display: none !important; }
         
-        #portal {
-            height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
-            background-size: cover; background-position: center; text-align: center; padding: 20px;
+        /* Ajuste para não vazar no iOS */
+        #view-cliente { 
+            background: #f4f4f4; color: #333; min-height: 100vh; 
+            width: 100%; padding: 80px 10px 40px 10px; /* Margem lateral de segurança */
+            display: flex; flex-direction: column; align-items: center;
         }
-        .logo-main { width: 140px; margin-bottom: 10px; }
-        .portal-title { font-family: 'Montserrat', sans-serif; font-size: 22px; color: #fff; margin-bottom: 35px; border-bottom: 2px solid var(--gold); padding-bottom: 8px; font-style: italic; }
-        
-        .btn-portal { width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; }
-        .btn-c { background: var(--primary); color: white; }
-        .btn-l { background: #333; color: #aaa; }
 
-        #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; width: 100vw; padding: 70px 15px 30px; }
-        .card-cliente { background: white; border-radius: 25px; padding: 25px; max-width: 480px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; }
+        .card-cliente { 
+            background: white; border-radius: 25px; padding: 20px; 
+            width: 100%; max-width: 450px; /* Limite para não esticar demais */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 0 auto;
+        }
         
-        .regras-box { background: #fff5f5; border-left: 5px solid var(--primary); padding: 15px; border-radius: 12px; font-size: 12px; margin-bottom: 20px; line-height: 1.6; }
-        .regras-box b { color: var(--primary); }
+        .regras-box { 
+            background: #fff5f5; border-left: 5px solid var(--primary); 
+            padding: 12px; border-radius: 12px; font-size: 11px; 
+            margin-bottom: 20px; line-height: 1.5;
+            word-wrap: break-word;
+        }
 
-        label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; color: #333; }
+        label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; margin-left: 5px; }
         
-        .pix-box { background: #fff9db; border: 2px dashed #f59f00; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; display: flex; flex-direction: column; align-items: center; }
-        .pix-code-display { background: #fff; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; margin: 10px 0; border: 1px solid #ddd; color: #333; width: 100%; word-wrap: break-word; overflow-wrap: break-word; text-align: left; }
+        /* Inputs com largura controlada */
+        input, select { 
+            width: 100%; padding: 14px; border: 2px solid #eee; 
+            border-radius: 12px; font-size: 16px; color: #333; 
+            appearance: none; -webkit-appearance: none; /* Remove estilo padrão iOS */
+        }
+
+        /* Container de Hora e Pessoas corrigido */
+        .grid-mobile {
+            display: flex; gap: 10px; width: 100%; margin-top: 5px;
+        }
+        .grid-mobile > div { flex: 1; min-width: 0; }
+
+        .pix-box { 
+            background: #fff9db; border: 2px dashed #f59f00; 
+            padding: 15px; border-radius: 15px; text-align: center; 
+            margin-top: 15px; width: 100%;
+        }
+
+        .pix-code-display { 
+            background: #fff; padding: 10px; border-radius: 8px; 
+            font-family: monospace; font-size: 10px; margin: 10px 0; 
+            border: 1px solid #ddd; color: #333; width: 100%;
+            word-break: break-all; white-space: normal;
+        }
         
-        .btn-enviar-final { width: 100%; padding: 18px; background: var(--success); color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 16px; }
+        .btn-enviar-final { 
+            width: 100%; padding: 18px; background: var(--success); 
+            color: white; border: none; border-radius: 15px; 
+            font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 16px; 
+        }
         .btn-enviar-final:disabled { background: #ccc; }
 
-        #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; width: 100vw; padding: 70px 15px; }
-        .reserva-card-adm { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; }
-        .btn-home { position: fixed; top: 15px; left: 15px; z-index: 2000; background: #000; color: #fff; padding: 10px 18px; border-radius: 25px; border: none; font-size: 12px; cursor: pointer; }
-        
-        #printArea { display: none; }
-        @media print {
-            body * { visibility: hidden; }
-            #printArea { display: block !important; visibility: visible !important; position: absolute; left: 0; top: 0; width: 100%; font-family: 'Courier Prime', monospace; color: #000; padding: 20px; font-size: 16px; }
-            #printArea * { visibility: visible !important; }
+        .btn-home { 
+            position: fixed; top: 15px; left: 15px; z-index: 2000; 
+            background: #000; color: #fff; padding: 10px 20px; 
+            border-radius: 25px; border: none; font-size: 12px; font-weight: bold;
+        }
+
+        #portal {
+            height: 100vh; width: 100%; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
+            background-size: cover; background-position: center; text-align: center; padding: 20px;
         }
     </style>
 </head>
@@ -58,36 +95,36 @@
     <div id="portal">
         <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main">
         <div class="portal-title">Reserva Nossa Carne</div>
-        <button class="btn-portal btn-c" onclick="ir('cliente')">NOVA RESERVA</button>
-        <button class="btn-portal btn-l" onclick="ir('loja')">PAINEL ADM</button>
+        <button class="btn-portal btn-c" style="background:var(--primary); color:#fff;" onclick="ir('cliente')">NOVA RESERVA</button>
+        <button class="btn-portal btn-l" style="background:#333; color:#aaa;" onclick="ir('loja')">PAINEL ADM</button>
     </div>
 
     <button id="btnHome" class="btn-home hidden" onclick="location.reload()">VOLTAR</button>
 
     <div id="view-cliente" class="hidden">
         <div class="card-cliente">
-            <h3 style="text-align:center; color:var(--primary); margin-top:0;">Nova Reserva</h3>
+            <h3 style="text-align:center; color:var(--primary); margin: 0 0 15px 0;">Nova Reserva</h3>
             
             <div class="regras-box">
                 <b>REGRAS DA CASA:</b><br>
-                • <b>Dias:</b> Reservas de Segunda a Quinta (12h às 21:30).<br>
-                • <b>Bolo da Casa:</b> Grupos de 10+ pessoas ganham 1kg grátis. Excedente R$ 95/kg.<br>
-                • <b>Itens Externos:</b> Taxa de Rolha de <b>R$ 40,00</b> para bebidas ou bolos trazidos de fora.<br>
-                • <b>Sinal:</b> Obrigatório pagamento de 50% do valor da encomenda do bolo (se exceder a cortesia).
+                • <b>Dias:</b> Seg a Qui (12h às 21:30).<br>
+                • <b>Bolo Casa:</b> 10+ pessoas ganha 1kg grátis.<br>
+                • <b>Rolha:</b> <b>R$ 40,00</b> (itens externos).<br>
+                • <b>Sinal:</b> 50% do valor da encomenda do bolo.
             </div>
 
             <label>Nome Completo</label>
-            <input type="text" id="c_nome" oninput="calc()">
+            <input type="text" id="c_nome" oninput="calc()" placeholder="Ex: Max Silva">
             
-            <label>WhatsApp (com DDD)</label>
+            <label>WhatsApp</label>
             <input type="tel" id="c_tel" placeholder="11999999999" oninput="calc()">
             
             <label>Data da Reserva</label>
             <input type="date" id="c_data" onchange="validarData()">
 
-            <div style="display:flex; gap:10px; margin-top:10px; width:100%;">
-                <div style="flex:1;"><label style="margin-top:0;">Hora</label><input type="time" id="c_hora" min="12:00" max="21:30"></div>
-                <div style="flex:1;"><label style="margin-top:0;">Pessoas</label><input type="number" id="c_qtd" value="1" min="1" oninput="calc()"></div>
+            <div class="grid-mobile">
+                <div><label>Hora</label><input type="time" id="c_hora"></div>
+                <div><label>Pessoas</label><input type="number" id="c_qtd" value="1" min="1" oninput="calc()"></div>
             </div>
 
             <label>Encomendar Bolo da Casa?</label>
@@ -109,19 +146,14 @@
                 <input type="number" id="c_kg" value="1" min="1" step="0.5" oninput="calc()">
 
                 <div id="painelFinanceiro" class="pix-box hidden">
-                    <p style="margin:0; font-weight:bold; color:#d35400;">PAGAMENTO DO SINAL</p>
-                    <img id="qrCode" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9" width="140" style="margin:10px auto; border: 5px solid #fff; border-radius: 10px; display:block;">
-                    
-                    <div style="font-size:10px; font-weight:bold; color:#555; width:100%; text-align:left;">PIX COPIA E COLA:</div>
+                    <p style="margin:0; font-weight:bold; color:#d35400; font-size:12px;">PAGAMENTO DO SINAL</p>
+                    <img id="qrCode" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9" width="130" style="margin:10px auto; border: 4px solid #fff; border-radius: 10px; display:block;">
                     <div class="pix-code-display" id="pixCopiaCola">00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9</div>
-                    
-                    <button onclick="copiarPix()" style="background:#f39c12; border:none; color:#fff; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%; margin-bottom:10px;">COPIAR PIX</button>
-                    
-                    <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 15px; color:var(--primary); background: #fff; padding: 5px; border-radius: 5px; width: 100%;"></div>
-                    
+                    <button onclick="copiarPix()" style="background:#f39c12; border:none; color:#fff; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">COPIAR PIX</button>
+                    <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 14px; color:var(--primary); background: #fff; padding: 8px; border-radius: 5px;"></div>
                     <button id="btnConfirmSinal" onclick="confirmarSinal()" style="width:100%; padding:15px; background:var(--ios-blue); border:none; color:#fff; border-radius:12px; font-weight:bold; cursor:pointer;">JÁ REALIZEI O PIX</button>
                 </div>
-                <div id="msgCortesia" class="hidden" style="text-align:center; padding:15px; color:#27ae60; font-weight:bold;">
+                <div id="msgCortesia" class="hidden" style="text-align:center; padding:15px; color:#27ae60; font-weight:bold; font-size:13px;">
                     ✨ Bolo de 1kg Cortesia Ativado!
                 </div>
             </div>
@@ -131,7 +163,7 @@
     </div>
 
     <div id="view-loja" class="hidden">
-        <div style="max-width:600px; margin:auto; width:100%;">
+        <div style="max-width:600px; margin:auto; width:95%;">
             <h3 style="color:#000; padding:10px;">Monitor de Reservas</h3>
             <div id="listaAdm"></div>
         </div>
@@ -162,7 +194,7 @@
             const input = document.getElementById('c_data');
             const dataObj = new Date(input.value + "T12:00:00");
             if(dataObj.getDay() === 0 || dataObj.getDay() === 6) {
-                alert("❌ DATA BLOQUEADA!\nReservas permitidas apenas de Segunda a Quinta.");
+                alert("❌ Reservas de Segunda a Quinta.");
                 input.value = "";
             }
             calc();
@@ -170,87 +202,50 @@
 
         function calc() {
             const bolo = document.getElementById('c_bolo').value, qtd = parseInt(document.getElementById('c_qtd').value) || 0, kg = parseFloat(document.getElementById('c_kg').value) || 0, nome = document.getElementById('c_nome').value, tel = document.getElementById('c_tel').value, data = document.getElementById('c_data').value, btn = document.getElementById('btnWhatsApp');
-            
-            const pixPanel = document.getElementById('painelFinanceiro');
-            const cortesiaMsg = document.getElementById('msgCortesia');
+            const pixPanel = document.getElementById('painelFinanceiro'), cortesiaMsg = document.getElementById('msgCortesia');
             let sinalExigido = false;
             
             if(bolo === 'sim') {
                 document.getElementById('secaoBolo').classList.remove('hidden');
                 let kgPago = (qtd >= 10) ? Math.max(0, kg - 1) : kg;
                 valorSinalGlobal = (kgPago * VALOR_KG) / 2;
-                
                 if (valorSinalGlobal > 0) {
-                    pixPanel.classList.remove('hidden');
-                    cortesiaMsg.classList.add('hidden');
-                    document.getElementById('valorInfo').innerHTML = `50% do valor da encomenda: <br> R$ ${valorSinalGlobal.toFixed(2)}`;
+                    pixPanel.classList.remove('hidden'); cortesiaMsg.classList.add('hidden');
+                    document.getElementById('valorInfo').innerHTML = `Sinal 50%: R$ ${valorSinalGlobal.toFixed(2)}`;
                     sinalExigido = !sinalOk;
                 } else {
-                    pixPanel.classList.add('hidden');
-                    cortesiaMsg.classList.remove('hidden');
+                    pixPanel.classList.add('hidden'); cortesiaMsg.classList.remove('hidden');
                     sinalExigido = false;
                 }
-            } else { 
-                document.getElementById('secaoBolo').classList.add('hidden'); 
-                valorSinalGlobal = 0;
-            }
+            } else { document.getElementById('secaoBolo').classList.add('hidden'); valorSinalGlobal = 0; }
             btn.disabled = !(nome.length > 3 && tel.length > 8 && data !== "" && !sinalExigido);
         }
 
-        function copiarPix() {
-            navigator.clipboard.writeText(PIX_STRING);
-            alert("✅ PIX Copia e Cola copiado!");
-        }
-
-        function confirmarSinal() { 
-            sinalOk = true; 
-            document.getElementById('btnConfirmSinal').style.background = "#27ae60"; 
-            document.getElementById('btnConfirmSinal').innerText = "PAGAMENTO INFORMADO ✓";
-            calc(); 
-        }
+        function copiarPix() { navigator.clipboard.writeText(PIX_STRING); alert("Copiado!"); }
+        function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
 
         function enviar() {
             const res = { id: Date.now(), nome: document.getElementById('c_nome').value, tel: document.getElementById('c_tel').value.replace(/\D/g,''), data: document.getElementById('c_data').value, hora: document.getElementById('c_hora').value, qtd: document.getElementById('c_qtd').value, sabor: document.getElementById('c_sabor').value, bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não', sinal: valorSinalGlobal };
-            db.push(res);
-            localStorage.setItem('nc_v3', JSON.stringify(db));
-            const msg = `*RESERVA NOSSA CARNE*\n\n👤 *Cliente:* ${res.nome}\n📅 *Data:* ${res.data.split('-').reverse().join('/')}\n⏰ *Hora:* ${res.hora}\n👥 *Pessoas:* ${res.qtd}\n🎂 *Bolo:* ${res.bolo} (${res.sabor})\n💰 *Sinal (50% Bolo):* R$ ${res.sinal.toFixed(2)}`;
+            db.push(res); localStorage.setItem('nc_v3', JSON.stringify(db));
+            const msg = `*RESERVA NOSSA CARNE*\n\n👤 *Cliente:* ${res.nome}\n📅 *Data:* ${res.data.split('-').reverse().join('/')}\n⏰ *Hora:* ${res.hora}\n👥 *Pessoas:* ${res.qtd}\n🎂 *Bolo:* ${res.bolo}\n💰 *Sinal:* R$ ${res.sinal.toFixed(2)}`;
             window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msg)}`);
         }
 
         function renderAdm() {
             const list = document.getElementById('listaAdm');
-            list.innerHTML = db.length ? "" : "<p>Sem reservas.</p>";
+            list.innerHTML = db.length ? "" : "<p>Vazio.</p>";
             db.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(r => {
-                list.innerHTML += `<div class="reserva-card-adm"><div style="display:flex; justify-content:space-between;"><b>${r.nome}</b><div><button onclick="imprimir('${r.id}')" style="background:var(--ios-blue); color:#fff; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;"><i class="fas fa-print"></i></button><button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; margin-left:15px;"><i class="fas fa-trash"></i></button></div></div><div style="font-size:13px; margin-top:5px;">${r.data.split('-').reverse().join('/')} às ${r.hora} | ${r.qtd} pessoas</div></div>`;
+                list.innerHTML += `<div class="reserva-card-adm"><div style="display:flex; justify-content:space-between;"><b>${r.nome}</b><div><button onclick="imprimir('${r.id}')" style="background:var(--ios-blue); color:#fff; border:none; padding:8px; border-radius:5px;"><i class="fas fa-print"></i></button><button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; margin-left:10px;"><i class="fas fa-trash"></i></button></div></div><div style="font-size:12px;">${r.data.split('-').reverse().join('/')} | ${r.hora} | ${r.qtd} pessoas</div></div>`;
             });
         }
 
         function imprimir(id) {
             const r = db.find(x => x.id == id);
-            document.getElementById('printArea').innerHTML = `
-                <div style="text-align:center;">
-                    <h2 style="margin:0">NOSSA CARNE</h2>
-                    <p style="margin:0">CONTROLE DE RESERVA</p>
-                    <p>--------------------------------</p>
-                    <div style="text-align:left">
-                        <p><b>DATA:</b> ${r.data.split('-').reverse().join('/')}</p>
-                        <p><b>HORA:</b> ${r.hora}</p>
-                        <p><b>CLIENTE:</b> ${r.nome.toUpperCase()}</p>
-                        <p><b>PESSOAS:</b> ${r.qtd}</p>
-                        <p>--------------------------------</p>
-                        <p><b>BOLO:</b> ${r.bolo}</p>
-                        <p><b>SABOR:</b> ${r.sabor}</p>
-                        <p><b>SINAL PAGO:</b> R$ ${r.sinal.toFixed(2)}</p>
-                    </div>
-                    <p>--------------------------------</p>
-                    <br><br>
-                    <p>_________________________</p>
-                    <p>Assinatura Responsável</p>
-                </div>`;
+            document.getElementById('printArea').innerHTML = `<div style="text-align:center;"><h2 style="margin:0">NOSSA CARNE</h2><p>RESERVA</p><hr><p><b>DATA:</b> ${r.data.split('-').reverse().join('/')}</p><p><b>CLIENTE:</b> ${r.nome}</p><p><b>PESSOAS:</b> ${r.qtd}</p><p><b>BOLO:</b> ${r.bolo}</p><p><b>SINAL:</b> R$ ${r.sinal.toFixed(2)}</p><hr></div>`;
             setTimeout(() => { window.print(); }, 500);
         }
 
-        function apagar(id) { if(confirm("Remover reserva?")) { db = db.filter(x => x.id != id); localStorage.setItem('nc_v3', JSON.stringify(db)); renderAdm(); } }
+        function apagar(id) { if(confirm("Remover?")) { db = db.filter(x => x.id != id); localStorage.setItem('nc_v3', JSON.stringify(db)); renderAdm(); } }
     </script>
 </body>
 </html>
