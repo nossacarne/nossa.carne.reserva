@@ -103,7 +103,7 @@
                         <option value="">--:--</option>
                     </select>
                 </div>
-                <div><label>Pessoas (Mín. 10)</label><input type="number" id="c_qtd" value="10" min="10" oninput="calc()"></div>
+                <div><label>Pessoas</label><input type="number" id="c_qtd" value="10" oninput="calc()"></div>
             </div>
 
             <label>Encomendar Bolo da Casa?</label>
@@ -143,6 +143,7 @@
             </div>
 
             <button id="btnWhatsApp" class="btn-enviar-final" onclick="enviar()" disabled><i class="fab fa-whatsapp"></i> FINALIZAR RESERVA</button>
+            <p id="msgErroQtd" style="color:red; font-size:11px; text-align:center; margin-top:5px;" class="hidden">Mínimo de 10 pessoas para reserva.</p>
         </div>
     </div>
 
@@ -171,34 +172,23 @@
         let valorSinalGlobal = 0;
 
         function gerarOpcoes() {
-            // Gerar Datas (Próximos 30 dias - Seg a Qui)
             const selData = document.getElementById('c_data');
             const hoje = new Date();
             for(let i=1; i<=45; i++) {
                 let d = new Date();
                 d.setDate(hoje.getDate() + i);
                 let iso = d.toISOString().split('T')[0];
-                let diaSemana = d.getDay(); // 0-Dom, 6-Sab
-                
+                let diaSemana = d.getDay(); 
                 if(diaSemana >= 1 && diaSemana <= 4 && !FERIADOS.includes(iso)) {
                     let texto = d.toLocaleDateString('pt-BR', {weekday: 'short', day: '2-digit', month: '2-digit'});
-                    let opt = new Option(texto.toUpperCase(), iso);
-                    selData.add(opt);
+                    selData.add(new Option(texto.toUpperCase(), iso));
                 }
             }
-
-            // Gerar Horários (12:00 às 21:30)
             const selHora = document.getElementById('c_hora');
             for(let h=12; h<=21; h++) {
                 ["00", "30"].forEach(m => {
-                    if(h === 21 && m === "30") {
-                        selHora.add(new Option("21:30", "21:30"));
-                        return;
-                    }
-                    if(h < 22) {
-                        let hora = `${h}:${m}`;
-                        selHora.add(new Option(hora, hora));
-                    }
+                    if(h === 21 && m === "30") selHora.add(new Option("21:30", "21:30"));
+                    else if(h < 22) selHora.add(new Option(`${h}:${m}`, `${h}:${m}`));
                 });
             }
         }
@@ -218,18 +208,17 @@
                   tel = document.getElementById('c_tel').value, 
                   data = document.getElementById('c_data').value, 
                   hora = document.getElementById('c_hora').value,
-                  btn = document.getElementById('btnWhatsApp');
+                  btn = document.getElementById('btnWhatsApp'),
+                  msgErro = document.getElementById('msgErroQtd');
             
             let qtd = parseInt(qtdInput.value) || 0;
             const kg = parseFloat(document.getElementById('c_kg').value) || 0;
             const pixPanel = document.getElementById('painelFinanceiro'), cortesiaMsg = document.getElementById('msgCortesia');
             let sinalExigido = false;
 
-            if (qtd < 10 && qtdInput.value !== "") {
-                alert("Mínimo de 10 pessoas para reserva.");
-                qtdInput.value = 10;
-                qtd = 10;
-            }
+            // Validação visual sem travar a digitação
+            if (qtd < 10 && qtdInput.value !== "") msgErro.classList.remove('hidden');
+            else msgErro.classList.add('hidden');
 
             if(bolo === 'sim') {
                 document.getElementById('secaoBolo').classList.remove('hidden');
@@ -251,11 +240,8 @@
         function enviar() {
             const res = { id: Date.now(), nome: document.getElementById('c_nome').value, tel: document.getElementById('c_tel').value.replace(/\D/g,''), data: document.getElementById('c_data').value, hora: document.getElementById('c_hora').value, qtd: document.getElementById('c_qtd').value, sabor: document.getElementById('c_sabor').value, bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não', sinal: valorSinalGlobal, status: 'pendente' };
             db.push(res); localStorage.setItem('nc_v3', JSON.stringify(db));
-            
             let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal para este número.*` : "";
-            
             const msg = `*RESERVA NOSSA CARNE*\n\n👤 *Cliente:* ${res.nome}\n📅 *Data:* ${res.data.split('-').reverse().join('/')}\n⏰ *Hora:* ${res.hora}\n👥 *Pessoas:* ${res.qtd}\n🎂 *Bolo:* ${res.bolo}\n💰 *Sinal:* R$ ${res.sinal.toFixed(2)}${msgSinal}`;
-            
             window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msg)}`);
         }
 
@@ -270,25 +256,19 @@
             const list = document.getElementById('listaAdm');
             list.innerHTML = "";
             const hoje = new Date().toISOString().split('T')[0];
-            
             let filtrados = db.sort((a,b) => new Date(a.data) - new Date(b.data));
             if(filtro === 'hoje') filtrados = filtrados.filter(r => r.data === hoje);
-
             if(!filtrados.length) { list.innerHTML = "<p>Nenhuma reserva.</p>"; return; }
 
             filtrados.forEach(r => {
                 const isConflito = db.filter(x => x.data === r.data && x.hora === r.hora).length > 1;
                 const statusCls = r.status === 'confirmado' ? 'status-confirmado' : 'status-pendente';
                 const msgWpp = encodeURIComponent(`Olá ${r.nome}, sou da Nossa Carne. Confirmamos sua reserva para ${r.data.split('-').reverse().join('/')} às ${r.hora}?`);
-
                 list.innerHTML += `
                 <div class="reserva-card-adm">
                     <span class="status-badge ${statusCls}">${r.status}</span>
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div>
-                            <b>${r.nome.toUpperCase()}</b><br>
-                            <small>📱 ${r.tel}</small>
-                        </div>
+                        <div><b>${r.nome.toUpperCase()}</b><br><small>📱 ${r.tel}</small></div>
                         <div>
                             <button onclick="alternarStatus(${r.id})" style="background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-check"></i></button>
                             <button onclick="window.open('https://wa.me/55${r.tel}?text=${msgWpp}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>
@@ -296,10 +276,7 @@
                             <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; margin-left:10px; cursor:pointer;"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
-                    <div style="font-size:13px; margin-top:5px; color:#555">
-                        📅 ${r.data.split('-').reverse().join('/')} às ${r.hora}<br>
-                        👥 ${r.qtd} pessoas | 🎂 ${r.bolo}
-                    </div>
+                    <div style="font-size:13px; margin-top:5px; color:#555">📅 ${r.data.split('-').reverse().join('/')} às ${r.hora}<br>👥 ${r.qtd} pessoas | 🎂 ${r.bolo}</div>
                     ${isConflito ? `<div class="alerta-conflito">⚠️ Outra reserva no mesmo horário!</div>` : ''}
                 </div>`;
             });
