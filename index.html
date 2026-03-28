@@ -33,7 +33,7 @@
         .regras-box { background: #fff5f5; border-left: 5px solid var(--primary); padding: 15px; border-radius: 12px; font-size: 11px; margin-bottom: 20px; line-height: 1.6; }
 
         label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; color: #333; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; color: #333; outline: none; }
         
         .grid-mobile { display: flex; gap: 10px; width: 100%; }
         .grid-mobile > div { flex: 1; }
@@ -62,7 +62,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="gerarOpcoes()">
 
     <div id="portal">
         <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main">
@@ -90,11 +90,19 @@
             <input type="text" id="c_nome" oninput="calc()">
             <label>WhatsApp</label>
             <input type="tel" id="c_tel" placeholder="11999999999" oninput="calc()">
-            <label>Data da Reserva</label>
-            <input type="date" id="c_data" onchange="validarData()">
+            
+            <label>Data da Reserva (Seg a Qui)</label>
+            <select id="c_data" onchange="calc()">
+                <option value="">Selecione a Data</option>
+            </select>
 
             <div class="grid-mobile">
-                <div><label>Hora</label><input type="time" id="c_hora" onchange="validarHora()"></div>
+                <div>
+                    <label>Hora</label>
+                    <select id="c_hora" onchange="calc()">
+                        <option value="">--:--</option>
+                    </select>
+                </div>
                 <div><label>Pessoas (Mín. 10)</label><input type="number" id="c_qtd" value="10" min="10" oninput="calc()"></div>
             </div>
 
@@ -162,9 +170,38 @@
         let sinalOk = false;
         let valorSinalGlobal = 0;
 
-        const amanha = new Date();
-        amanha.setDate(amanha.getDate() + 1);
-        document.getElementById('c_data').min = amanha.toISOString().split("T")[0];
+        function gerarOpcoes() {
+            // Gerar Datas (Próximos 30 dias - Seg a Qui)
+            const selData = document.getElementById('c_data');
+            const hoje = new Date();
+            for(let i=1; i<=45; i++) {
+                let d = new Date();
+                d.setDate(hoje.getDate() + i);
+                let iso = d.toISOString().split('T')[0];
+                let diaSemana = d.getDay(); // 0-Dom, 6-Sab
+                
+                if(diaSemana >= 1 && diaSemana <= 4 && !FERIADOS.includes(iso)) {
+                    let texto = d.toLocaleDateString('pt-BR', {weekday: 'short', day: '2-digit', month: '2-digit'});
+                    let opt = new Option(texto.toUpperCase(), iso);
+                    selData.add(opt);
+                }
+            }
+
+            // Gerar Horários (12:00 às 21:30)
+            const selHora = document.getElementById('c_hora');
+            for(let h=12; h<=21; h++) {
+                ["00", "30"].forEach(m => {
+                    if(h === 21 && m === "30") {
+                        selHora.add(new Option("21:30", "21:30"));
+                        return;
+                    }
+                    if(h < 22) {
+                        let hora = `${h}:${m}`;
+                        selHora.add(new Option(hora, hora));
+                    }
+                });
+            }
+        }
 
         function ir(v) {
             if(v === 'loja' && prompt("Senha ADM:") !== "9002") return;
@@ -172,31 +209,6 @@
             document.getElementById('btnHome').classList.remove('hidden');
             document.getElementById('view-'+v).classList.remove('hidden');
             if(v === 'loja') renderAdm();
-        }
-
-        function validarData() {
-            const input = document.getElementById('c_data');
-            const dataVal = input.value;
-            if(!dataVal) return;
-            const dataObj = new Date(dataVal + "T12:00:00");
-            const diaSemana = dataObj.getDay(); 
-
-            if(diaSemana === 0 || diaSemana === 6 || FERIADOS.includes(dataVal)) {
-                alert("⚠️ DATA BLOQUEADA!\nReservas permitidas apenas de Segunda a Quinta, exceto feriados.");
-                input.value = "";
-            }
-            calc();
-        }
-
-        function validarHora() {
-            const input = document.getElementById('c_hora');
-            const hora = input.value;
-            if(!hora) return;
-            if(hora < "12:00" || hora > "21:30") {
-                alert("⚠️ HORÁRIO INDISPONÍVEL!\nReservas permitidas apenas das 12:00 às 21:30.");
-                input.value = "";
-            }
-            calc();
         }
 
         function calc() {
