@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@400;600;700&family=Courier+Prime&display=swap" rel="stylesheet">
 
     <style>
-        :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; }
+        :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; --warning: #f1c40f; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100%; }
@@ -47,7 +47,12 @@
         .btn-home { position: fixed; top: 15px; left: 15px; z-index: 2000; background: #000; color: #fff; padding: 10px 18px; border-radius: 25px; border: none; font-size: 12px; cursor: pointer; }
 
         #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; width: 100%; padding: 70px 15px; }
-        .reserva-card-adm { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; }
+        .reserva-card-adm { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; position: relative; }
+        
+        .status-badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: inline-block; }
+        .status-pendente { background: var(--warning); color: #000; }
+        .status-confirmado { background: var(--success); color: #fff; }
+        .alerta-conflito { background: #ffeded; color: #c0392b; font-size: 11px; padding: 5px; border-radius: 5px; margin-top: 5px; border: 1px solid #ffcccc; font-weight: bold; }
 
         #printArea { display: none; }
         @media print {
@@ -117,6 +122,11 @@
                     <div class="pix-code-display" id="pixCopiaCola">00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9</div>
                     <button onclick="copiarPix()" style="background:#f39c12; border:none; color:#fff; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">COPIAR PIX</button>
                     <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 14px; color:var(--primary); background: #fff; padding: 8px; border-radius: 5px;"></div>
+                    
+                    <div id="avisoComprovante" style="font-size: 11px; color: #c0392b; margin: 10px 0; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
+                        ⚠️ Após clicar em finalizar, envie o comprovante do PIX via WhatsApp para validar sua reserva.
+                    </div>
+
                     <button id="btnConfirmSinal" onclick="confirmarSinal()" style="width:100%; padding:15px; background:var(--ios-blue); border:none; color:#fff; border-radius:12px; font-weight:bold; cursor:pointer;">JÁ REALIZEI O PIX</button>
                 </div>
                 <div id="msgCortesia" class="hidden" style="text-align:center; padding:15px; color:#27ae60; font-weight:bold; font-size:13px;">
@@ -130,7 +140,13 @@
 
     <div id="view-loja" class="hidden">
         <div style="max-width:600px; margin:auto; width:95%;">
-            <h3 style="color:#000; padding:10px;">Monitor de Reservas</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color:#000;">Monitor de Reservas</h3>
+                <div>
+                    <button onclick="renderAdm('hoje')" style="padding:5px 10px; border-radius:5px; border:1px solid #ccc; cursor:pointer; font-size:12px;">Hoje</button>
+                    <button onclick="renderAdm('todos')" style="padding:5px 10px; border-radius:5px; border:1px solid #ccc; cursor:pointer; font-size:12px;">Tudo</button>
+                </div>
+            </div>
             <div id="listaAdm"></div>
         </div>
     </div>
@@ -221,17 +237,59 @@
         function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
 
         function enviar() {
-            const res = { id: Date.now(), nome: document.getElementById('c_nome').value, tel: document.getElementById('c_tel').value.replace(/\D/g,''), data: document.getElementById('c_data').value, hora: document.getElementById('c_hora').value, qtd: document.getElementById('c_qtd').value, sabor: document.getElementById('c_sabor').value, bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não', sinal: valorSinalGlobal };
+            const res = { id: Date.now(), nome: document.getElementById('c_nome').value, tel: document.getElementById('c_tel').value.replace(/\D/g,''), data: document.getElementById('c_data').value, hora: document.getElementById('c_hora').value, qtd: document.getElementById('c_qtd').value, sabor: document.getElementById('c_sabor').value, bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não', sinal: valorSinalGlobal, status: 'pendente' };
             db.push(res); localStorage.setItem('nc_v3', JSON.stringify(db));
-            const msg = `*RESERVA NOSSA CARNE*\n\n👤 *Cliente:* ${res.nome}\n📅 *Data:* ${res.data.split('-').reverse().join('/')}\n⏰ *Hora:* ${res.hora}\n👥 *Pessoas:* ${res.qtd}\n🎂 *Bolo:* ${res.bolo}\n💰 *Sinal:* R$ ${res.sinal.toFixed(2)}`;
+            
+            let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal para este número.*` : "";
+            
+            const msg = `*RESERVA NOSSA CARNE*\n\n👤 *Cliente:* ${res.nome}\n📅 *Data:* ${res.data.split('-').reverse().join('/')}\n⏰ *Hora:* ${res.hora}\n👥 *Pessoas:* ${res.qtd}\n🎂 *Bolo:* ${res.bolo}\n💰 *Sinal:* R$ ${res.sinal.toFixed(2)}${msgSinal}`;
+            
             window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msg)}`);
         }
 
-        function renderAdm() {
+        function alternarStatus(id) {
+            const r = db.find(x => x.id == id);
+            r.status = r.status === 'pendente' ? 'confirmado' : 'pendente';
+            localStorage.setItem('nc_v3', JSON.stringify(db));
+            renderAdm();
+        }
+
+        function renderAdm(filtro = 'todos') {
             const list = document.getElementById('listaAdm');
-            list.innerHTML = db.length ? "" : "<p>Vazio.</p>";
-            db.sort((a,b) => new Date(a.data) - new Date(b.data)).forEach(r => {
-                list.innerHTML += `<div class="reserva-card-adm"><div style="display:flex; justify-content:space-between; align-items:center;"><b>${r.nome.toUpperCase()}</b><div><button onclick="imprimir('${r.id}')" style="background:var(--ios-blue); color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;"><i class="fas fa-print"></i></button><button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; margin-left:15px; cursor:pointer;"><i class="fas fa-trash"></i></button></div></div><div style="font-size:13px; margin-top:5px; color:#555">📅 ${r.data.split('-').reverse().join('/')} às ${r.hora}<br>👥 ${r.qtd} pessoas | 🎂 ${r.bolo}</div></div>`;
+            list.innerHTML = "";
+            const hoje = new Date().toISOString().split('T')[0];
+            
+            let filtrados = db.sort((a,b) => new Date(a.data) - new Date(b.data));
+            if(filtro === 'hoje') filtrados = filtrados.filter(r => r.data === hoje);
+
+            if(!filtrados.length) { list.innerHTML = "<p>Nenhuma reserva.</p>"; return; }
+
+            filtrados.forEach(r => {
+                const isConflito = db.filter(x => x.data === r.data && x.hora === r.hora).length > 1;
+                const statusCls = r.status === 'confirmado' ? 'status-confirmado' : 'status-pendente';
+                const msgWpp = encodeURIComponent(`Olá ${r.nome}, sou da Nossa Carne. Confirmamos sua reserva para ${r.data.split('-').reverse().join('/')} às ${r.hora}?`);
+
+                list.innerHTML += `
+                <div class="reserva-card-adm">
+                    <span class="status-badge ${statusCls}">${r.status}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <b>${r.nome.toUpperCase()}</b><br>
+                            <small>📱 ${r.tel}</small>
+                        </div>
+                        <div>
+                            <button onclick="alternarStatus(${r.id})" style="background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-check"></i></button>
+                            <button onclick="window.open('https://wa.me/55${r.tel}?text=${msgWpp}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>
+                            <button onclick="imprimir('${r.id}')" style="background:var(--ios-blue); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-print"></i></button>
+                            <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; margin-left:10px; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div style="font-size:13px; margin-top:5px; color:#555">
+                        📅 ${r.data.split('-').reverse().join('/')} às ${r.hora}<br>
+                        👥 ${r.qtd} pessoas | 🎂 ${r.bolo}
+                    </div>
+                    ${isConflito ? `<div class="alerta-conflito">⚠️ Outra reserva no mesmo horário!</div>` : ''}
+                </div>`;
             });
         }
 
