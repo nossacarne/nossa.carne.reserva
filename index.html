@@ -51,7 +51,7 @@
         .alerta-conflito { background: #ffeded; color: #c0392b; font-size: 11px; padding: 5px; border-radius: 5px; margin-top: 5px; border: 1px solid #ffcccc; font-weight: bold; }
 
         #printArea { display: none; }
-        @media print { body * { display: none !important; } #printArea { display: block !important; color: #000 !important; background: #fff !important; font-family: 'Courier Prime', monospace !important; padding: 20px; } #printArea * { display: block !important; } }
+        @media print { body * { display: none !important; } #printArea { display: block !important; color: #000 !important; background: #fff !important; font-family: 'Courier Prime', monospace !important; padding: 20px; font-size: 14px; } #printArea * { display: block !important; margin-bottom: 5px; } }
     </style>
 </head>
 <body>
@@ -70,15 +70,15 @@
             <h3 style="text-align:center; color:var(--primary); margin-top:0;">Nova Reserva</h3>
             <div class="regras-box">
                 <b>REGRAS DA CASA:</b><br>
-                • <b>Reservas a partir de 10 pessoas</b>.<br>
-                • <b>Horário</b>: <b>12h às 21:30</b> (Seg a Qui).<br>
-                • <b>Bolo Cortesia</b>: 1kg grátis(Valido para  10+ pessoas).Excedente de 1kg R$95,00kg <br>
-                • <b>Sinal:</b> 50% se houver encomenda de bolo .
+                • Reservas a partir de <b>10 pessoas</b>.<br>
+                • Horário: <b>12h às 21:30</b> (Seg a Qui).<br>
+                • Bolo Casa: 10+ pessoas ganha 1kg grátis.<br>
+                • <b>Sinal:</b> 50% se houver encomenda de bolo.
             </div>
 
             <label>Nome Completo</label>
             <input type="text" id="c_nome" placeholder="Seu nome" oninput="calc()">
-            <label>(DDD)Telefone</label>
+            <label>WhatsApp</label>
             <input type="tel" id="c_tel" placeholder="11999999999" oninput="calc()">
             
             <label>Data da Reserva</label>
@@ -122,7 +122,7 @@
                     <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 14px; color:var(--primary); background: #fff; padding: 8px; border-radius: 5px;"></div>
                     
                     <div id="avisoComprovante" style="font-size: 11px; color: #c0392b; margin: 10px 0; font-weight: bold; text-transform: uppercase;">
-                        ⚠️ Após finalizar, envie o comprovante do PIX via WhatsApp.
+                        ⚠️ Após finalizar, envie o comprovante via WhatsApp.
                     </div>
                     <button id="btnConfirmSinal" onclick="confirmarSinal()" style="width:100%; padding:15px; background:var(--ios-blue); border:none; color:#fff; border-radius:12px; font-weight:bold; cursor:pointer;">JÁ REALIZEI O PIX</button>
                 </div>
@@ -280,6 +280,34 @@
 
         function apagar(id) { if(confirm("Remover esta reserva definitivamente?")) db.collection("reservas").doc(id).delete(); }
 
+        // NOVA FUNÇÃO DE IMPRESSÃO DA COMANDA
+        function imprimirComanda(id) {
+            const r = reservasNuvem.find(res => res.id === id);
+            if(!r) return;
+            
+            const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
+            const htmlComanda = `
+                <div style="text-align:center; font-weight:bold; font-size:20px; margin-bottom:5px;">NOSSA CARNE</div>
+                <div style="text-align:center; font-size:14px; margin-bottom:15px; text-transform:uppercase;">Comanda de Reserva</div>
+                <div style="border-bottom:1px dashed #000; margin-bottom:10px;"></div>
+                <div><b>CLIENTE:</b> ${r.nome.toUpperCase()}</div>
+                <div><b>TELEFONE:</b> ${r.tel}</div>
+                <div><b>DATA:</b> ${dataFormat}</div>
+                <div><b>HORA:</b> ${r.hora}h</div>
+                <div><b>PESSOAS:</b> ${r.qtd}</div>
+                <div style="border-bottom:1px dashed #000; margin:10px 0;"></div>
+                <div><b>BOLO:</b> ${r.bolo}</div>
+                <div><b>SABOR:</b> ${r.sabor || 'N/A'}</div>
+                <div><b>SINAL (PAGO):</b> R$ ${parseFloat(r.sinal || 0).toFixed(2)}</div>
+                <div><b>STATUS:</b> ${r.status.toUpperCase()}</div>
+                <div style="border-bottom:1px dashed #000; margin:10px 0;"></div>
+                <div style="text-align:center; font-size:11px; margin-top:10px;">Impresso em: ${new Date().toLocaleString('pt-BR')}</div>
+            `;
+            
+            document.getElementById('printArea').innerHTML = htmlComanda;
+            window.print();
+        }
+
         function renderAdm(filtro = 'todos') {
             const list = document.getElementById('listaAdm');
             list.innerHTML = "";
@@ -293,7 +321,6 @@
                 const isConflito = filtrados.filter(x => x.data === r.data && x.hora === r.hora).length > 1;
                 const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
                 
-                // MENSAGEM AUTOMÁTICA DE CONFIRMAÇÃO PARA O ADM
                 const msgConfirmacao = `Olá ${r.nome}, tudo bem? Sou da Nossa Carne! Passando para confirmar sua reserva para o dia ${dataFormat} às ${r.hora}. Podemos confirmar?`;
                 const linkWpp = `https://wa.me/55${r.tel}?text=${encodeURIComponent(msgConfirmacao)}`;
 
@@ -305,7 +332,8 @@
                         <div>
                             <button onclick="alternarStatus('${r.id}', '${r.status}')" style="background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-check"></i></button>
                             <button onclick="window.open('${linkWpp}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>
-                            <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; cursor:pointer; margin-left:10px;"><i class="fas fa-trash"></i></button>
+                            <button onclick="imprimirComanda('${r.id}')" style="background:#3498db; color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer; margin-left:5px;"><i class="fas fa-print"></i></button>
+                            <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; cursor:pointer; margin-left:5px;"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                     <div style="font-size:13px; color:#555; margin-top:5px;">📅 ${dataFormat} às ${r.hora} | 👥 ${r.qtd} | 🎂 ${r.bolo}</div>
