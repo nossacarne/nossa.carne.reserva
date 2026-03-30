@@ -54,13 +54,13 @@
         @media print { body * { display: none !important; } #printArea { display: block !important; color: #000 !important; background: #fff !important; font-family: 'Courier Prime', monospace !important; padding: 20px; } #printArea * { display: block !important; } }
     </style>
 </head>
-<body onload="gerarOpcoes()">
+<body>
 
     <div id="portal">
         <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main">
         <div class="portal-title">Reserva Nossa Carne</div>
-        <button class="btn-portal btn-c" onclick="ir('cliente')"><i class="fas fa-utensils"></i> NOVA RESERVA</button>
-        <button class="btn-portal btn-l" onclick="ir('loja')"><i class="fas fa-lock"></i> PAINEL ADM</button>
+        <button class="btn-portal btn-c" id="btnIrCliente" onclick="ir('cliente')"><i class="fas fa-utensils"></i> NOVA RESERVA</button>
+        <button class="btn-portal btn-l" id="btnIrLoja" onclick="ir('loja')"><i class="fas fa-lock"></i> PAINEL ADM</button>
     </div>
 
     <button id="btnHome" class="btn-home hidden" onclick="location.reload()">VOLTAR</button>
@@ -77,7 +77,7 @@
             </div>
 
             <label>Nome Completo</label>
-            <input type="text" id="c_nome" placeholder="Seu nome aqui" oninput="calc()">
+            <input type="text" id="c_nome" placeholder="Seu nome" oninput="calc()">
             <label>WhatsApp</label>
             <input type="tel" id="c_tel" placeholder="11999999999" oninput="calc()">
             
@@ -136,4 +136,178 @@
     <div id="view-loja" class="hidden">
         <div style="max-width:600px; margin:auto; width:95%;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                <h3
+                <h3 style="color:#000; margin:0;">Monitor ADM</h3>
+                <div>
+                    <button onclick="renderAdm('hoje')" style="padding:8px; border-radius:8px; border:1px solid #ccc; cursor:pointer; font-size:12px; background:#fff;">Hoje</button>
+                    <button onclick="renderAdm('todos')" style="padding:8px; border-radius:8px; border:1px solid #ccc; cursor:pointer; font-size:12px; background:#fff;">Tudo</button>
+                </div>
+            </div>
+            <div id="listaAdm">Carregando reservas...</div>
+        </div>
+    </div>
+
+    <div id="printArea"></div>
+
+    <script>
+        // CONFIGURAÇÃO FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCEWs1FvE4TF7dzIDjG3f6C9GmM6VKsrE",
+            authDomain: "nossa-carne-fea04.firebaseapp.com",
+            projectId: "nossa-carne-fea04",
+            storageBucket: "nossa-carne-fea04.firebasestorage.app",
+            messagingSenderId: "5141362228",
+            appId: "1:5141362228:web:69424a0391c8ca3d9389f3",
+            measurementId: "G-0E1XTDECP7"
+        };
+        
+        // Inicialização Segura
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        const PIX_STRING = "00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9";
+        const VALOR_KG = 95.00;
+        const FERIADOS = ["2026-01-01", "2026-12-25"];
+        let sinalOk = false;
+        let valorSinalGlobal = 0;
+        let reservasNuvem = [];
+
+        window.onload = function() {
+            gerarOpcoes();
+        };
+
+        function gerarOpcoes() {
+            const selData = document.getElementById('c_data');
+            const hoje = new Date();
+            for(let i=1; i<=45; i++) {
+                let d = new Date(); d.setDate(hoje.getDate() + i);
+                let iso = d.toISOString().split('T')[0];
+                if(d.getDay() >= 1 && d.getDay() <= 4 && !FERIADOS.includes(iso)) {
+                    selData.add(new Option(d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}).toUpperCase(), iso));
+                }
+            }
+            const selHora = document.getElementById('c_hora');
+            for(let h=12; h<=21; h++) {
+                ["00", "30"].forEach(m => selHora.add(new Option(`${h}:${m}`, `${h}:${m}`)));
+            }
+        }
+
+        function ir(v) {
+            if(v === 'loja' && prompt("Senha ADM:") !== "9002") return;
+            document.getElementById('portal').classList.add('hidden');
+            document.getElementById('view-cliente').classList.add('hidden');
+            document.getElementById('view-loja').classList.add('hidden');
+            document.getElementById('btnHome').classList.remove('hidden');
+            document.getElementById('view-'+v).classList.remove('hidden');
+            if(v === 'loja') monitorarReservas();
+        }
+
+        function calc() {
+            const bolo = document.getElementById('c_bolo').value, qtdInput = document.getElementById('c_qtd'),
+                  nome = document.getElementById('c_nome').value, tel = document.getElementById('c_tel').value,
+                  data = document.getElementById('c_data').value, hora = document.getElementById('c_hora').value,
+                  btn = document.getElementById('btnWhatsApp'), msgErro = document.getElementById('msgErroQtd');
+            
+            let qtd = parseInt(qtdInput.value) || 0;
+            const kg = parseFloat(document.getElementById('c_kg').value) || 0;
+            let sinalExigido = false;
+
+            if (qtd < 10 && qtdInput.value !== "") msgErro.classList.remove('hidden');
+            else msgErro.classList.add('hidden');
+
+            if(bolo === 'sim') {
+                document.getElementById('secaoBolo').classList.remove('hidden');
+                let kgPago = (qtd >= 10) ? Math.max(0, kg - 1) : kg;
+                valorSinalGlobal = (kgPago * VALOR_KG) / 2;
+                if (valorSinalGlobal > 0) {
+                    document.getElementById('painelFinanceiro').classList.remove('hidden');
+                    document.getElementById('valorInfo').innerHTML = `Sinal 50%: R$ ${valorSinalGlobal.toFixed(2)}`;
+                    sinalExigido = !sinalOk;
+                } else { document.getElementById('painelFinanceiro').classList.add('hidden'); sinalExigido = false; }
+            } else { document.getElementById('secaoBolo').classList.add('hidden'); valorSinalGlobal = 0; }
+            
+            btn.disabled = !(nome.length > 3 && tel.length > 8 && data !== "" && hora !== "" && qtd >= 10 && !sinalExigido);
+        }
+
+        function copiarPix() { navigator.clipboard.writeText(PIX_STRING); alert("Pix Copiado!"); }
+        function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
+
+        async function enviar() {
+            const btn = document.getElementById('btnWhatsApp');
+            btn.disabled = true;
+            btn.innerText = "ENVIANDO...";
+
+            const res = {
+                nome: document.getElementById('c_nome').value,
+                tel: document.getElementById('c_tel').value.replace(/\D/g,''),
+                data: document.getElementById('c_data').value,
+                hora: document.getElementById('c_hora').value,
+                qtd: document.getElementById('c_qtd').value,
+                sabor: document.getElementById('c_sabor').value || 'N/A',
+                bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não',
+                sinal: valorSinalGlobal,
+                status: 'pendente',
+                criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection("reservas").add(res);
+                alert("Reserva enviada com sucesso!");
+                let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal.*` : "";
+                const msgText = `*RESERVA NOSSA CARNE*\n👤 ${res.nome}\n📅 ${res.data.split('-').reverse().join('/')}\n⏰ ${res.hora}\n👥 ${res.qtd} pessoas\n🎂 Bolo: ${res.bolo}\n💰 Sinal: R$ ${res.sinal.toFixed(2)}${msgSinal}`;
+                window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msgText)}`);
+                location.reload(); 
+            } catch (e) { 
+                alert("Erro ao salvar: " + e); 
+                btn.disabled = false;
+                btn.innerText = "TENTAR NOVAMENTE";
+            }
+        }
+
+        function monitorarReservas() {
+            db.collection("reservas").orderBy("data", "asc").onSnapshot((snapshot) => {
+                reservasNuvem = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAdm();
+            }, (error) => {
+                document.getElementById('listaAdm').innerText = "Erro ao carregar: Verifique as Regras Firestore.";
+            });
+        }
+
+        function alternarStatus(id, statusAtual) {
+            db.collection("reservas").doc(id).update({ status: statusAtual === 'pendente' ? 'confirmado' : 'pendente' });
+        }
+
+        function apagar(id) { if(confirm("Remover esta reserva definitivamente?")) db.collection("reservas").doc(id).delete(); }
+
+        function renderAdm(filtro = 'todos') {
+            const list = document.getElementById('listaAdm');
+            list.innerHTML = "";
+            const hoje = new Date().toISOString().split('T')[0];
+            let filtrados = reservasNuvem;
+            if(filtro === 'hoje') filtrados = filtrados.filter(r => r.data === hoje);
+
+            if(filtrados.length === 0) { list.innerHTML = "<p style='text-align:center;'>Nenhuma reserva.</p>"; return; }
+
+            filtrados.forEach(r => {
+                const isConflito = filtrados.filter(x => x.data === r.data && x.hora === r.hora).length > 1;
+                const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
+                list.innerHTML += `
+                <div class="reserva-card-adm">
+                    <span class="status-badge ${r.status === 'confirmado' ? 'status-confirmado' : 'status-pendente'}">${r.status}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><b>${r.nome.toUpperCase()}</b><br><small>📱 ${r.tel}</small></div>
+                        <div>
+                            <button onclick="alternarStatus('${r.id}', '${r.status}')" style="background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-check"></i></button>
+                            <button onclick="window.open('https://wa.me/55${r.tel}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>
+                            <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; cursor:pointer; margin-left:10px;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div style="font-size:13px; color:#555; margin-top:5px;">📅 ${dataFormat} às ${r.hora} | 👥 ${r.qtd} | 🎂 ${r.bolo}</div>
+                    ${isConflito ? `<div class="alerta-conflito">⚠️ Outra reserva no mesmo horário!</div>` : ''}
+                </div>`;
+            });
+        }
+    </script>
+</body>
+</html>
