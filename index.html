@@ -8,19 +8,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@400;600;700&family=Courier+Prime&display=swap" rel="stylesheet">
 
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; --warning: #f1c40f; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
         body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100%; }
         .hidden { display: none !important; }
         
-        #portal {
-            height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png');
-            background-size: cover; background-position: center; text-align: center; padding: 20px;
-        }
-
+        #portal { height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png'); background-size: cover; background-position: center; text-align: center; padding: 20px; }
         .logo-main { width: 180px; max-width: 80%; margin-bottom: 20px; border-radius: 20px; border: 2px solid var(--gold); background: #fff; }
         .portal-title { font-family: 'Montserrat', sans-serif; font-size: 22px; color: #fff; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 8px; font-style: italic; }
         
@@ -31,10 +28,9 @@
         #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; width: 100%; padding: 70px 15px 30px; display: flex; flex-direction: column; align-items: center; }
         .card-cliente { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: 0 auto; }
         .regras-box { background: #fff5f5; border-left: 5px solid var(--primary); padding: 15px; border-radius: 12px; font-size: 11px; margin-bottom: 20px; line-height: 1.6; }
-
+        
         label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; }
         input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; color: #333; outline: none; }
-        
         .grid-mobile { display: flex; gap: 10px; width: 100%; }
         .grid-mobile > div { flex: 1; }
 
@@ -55,11 +51,7 @@
         .alerta-conflito { background: #ffeded; color: #c0392b; font-size: 11px; padding: 5px; border-radius: 5px; margin-top: 5px; border: 1px solid #ffcccc; font-weight: bold; }
 
         #printArea { display: none; }
-        @media print {
-            body * { display: none !important; }
-            #printArea { display: block !important; color: #000 !important; background: #fff !important; font-family: 'Courier Prime', monospace !important; padding: 20px; }
-            #printArea * { display: block !important; }
-        }
+        @media print { body * { display: none !important; } #printArea { display: block !important; color: #000 !important; background: #fff !important; font-family: 'Courier Prime', monospace !important; padding: 20px; } #printArea * { display: block !important; } }
     </style>
 </head>
 <body onload="gerarOpcoes()">
@@ -78,20 +70,18 @@
             <h3 style="text-align:center; color:var(--primary); margin-top:0;">Nova Reserva</h3>
             <div class="regras-box">
                 <b>REGRAS DA CASA:</b><br>
-                • <b>Mínimo:</b> Reservas apenas a partir de <b>10 pessoas</b>.<br>
-                • <b>Horário:</b> Disponível apenas das <b>12h às 21:30</b>.<br>
-                • <b>Dias:</b> Seg a Qui. Não reservamos feriados ou finais de semana.<br>
-                • <b>Bolo Casa:</b> 10+ pessoas ganha 1kg grátis. Excedente R$ 95/kg.<br>
-                • <b>Rolha:</b> <b>R$ 40,00</b> (bebidas/bolos externos).<br>
-                • <b>Sinal:</b> 50% do valor da encomenda ou se exceder o kg da cortesia.
+                • Reservas a partir de <b>10 pessoas</b>.<br>
+                • Horário: <b>12h às 21:30</b> (Seg a Qui).<br>
+                • Bolo Casa: 10+ pessoas ganha 1kg grátis.<br>
+                • <b>Sinal:</b> 50% se houver encomenda de bolo.
             </div>
 
             <label>Nome Completo</label>
-            <input type="text" id="c_nome" oninput="calc()">
+            <input type="text" id="c_nome" placeholder="Seu nome aqui" oninput="calc()">
             <label>WhatsApp</label>
             <input type="tel" id="c_tel" placeholder="11999999999" oninput="calc()">
             
-            <label>Data da Reserva (Seg a Qui)</label>
+            <label>Data da Reserva</label>
             <select id="c_data" onchange="calc()">
                 <option value="">Selecione a Data</option>
             </select>
@@ -103,7 +93,7 @@
                         <option value="">--:--</option>
                     </select>
                 </div>
-                <div><label>Pessoas</label><input type="number" id="c_qtd" value="10" oninput="calc()"></div>
+                <div><label>Pessoas</label><input type="number" id="c_qtd" value="10" min="10" oninput="calc()"></div>
             </div>
 
             <label>Encomendar Bolo da Casa?</label>
@@ -131,165 +121,19 @@
                     <button onclick="copiarPix()" style="background:#f39c12; border:none; color:#fff; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">COPIAR PIX</button>
                     <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 14px; color:var(--primary); background: #fff; padding: 8px; border-radius: 5px;"></div>
                     
-                    <div id="avisoComprovante" style="font-size: 11px; color: #c0392b; margin: 10px 0; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
-                        ⚠️ Após clicar em finalizar, envie o comprovante do PIX via WhatsApp para validar sua reserva.
+                    <div id="avisoComprovante" style="font-size: 11px; color: #c0392b; margin: 10px 0; font-weight: bold; text-transform: uppercase;">
+                        ⚠️ Após finalizar, envie o comprovante via WhatsApp.
                     </div>
-
                     <button id="btnConfirmSinal" onclick="confirmarSinal()" style="width:100%; padding:15px; background:var(--ios-blue); border:none; color:#fff; border-radius:12px; font-weight:bold; cursor:pointer;">JÁ REALIZEI O PIX</button>
-                </div>
-                <div id="msgCortesia" class="hidden" style="text-align:center; padding:15px; color:#27ae60; font-weight:bold; font-size:13px;">
-                    ✨ Bolo de 1kg Cortesia Ativado!
                 </div>
             </div>
 
             <button id="btnWhatsApp" class="btn-enviar-final" onclick="enviar()" disabled><i class="fab fa-whatsapp"></i> FINALIZAR RESERVA</button>
-            <p id="msgErroQtd" style="color:red; font-size:11px; text-align:center; margin-top:5px;" class="hidden">Mínimo de 10 pessoas para reserva.</p>
+            <p id="msgErroQtd" style="color:red; font-size:11px; text-align:center; margin-top:5px;" class="hidden">Mínimo de 10 pessoas.</p>
         </div>
     </div>
 
     <div id="view-loja" class="hidden">
         <div style="max-width:600px; margin:auto; width:95%;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="color:#000;">Monitor de Reservas</h3>
-                <div>
-                    <button onclick="renderAdm('hoje')" style="padding:5px 10px; border-radius:5px; border:1px solid #ccc; cursor:pointer; font-size:12px;">Hoje</button>
-                    <button onclick="renderAdm('todos')" style="padding:5px 10px; border-radius:5px; border:1px solid #ccc; cursor:pointer; font-size:12px;">Tudo</button>
-                </div>
-            </div>
-            <div id="listaAdm"></div>
-        </div>
-    </div>
-
-    <div id="printArea"></div>
-
-    <script>
-        const PIX_STRING = "00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9";
-        const VALOR_KG = 95.00;
-        const FERIADOS = ["2026-01-01", "2026-02-16", "2026-02-17", "2026-04-03", "2026-04-21", "2026-05-01", "2026-06-04", "2026-07-09", "2026-09-07", "2026-10-12", "2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25"];
-        
-        let db = JSON.parse(localStorage.getItem('nc_v3')) || [];
-        let sinalOk = false;
-        let valorSinalGlobal = 0;
-
-        function gerarOpcoes() {
-            const selData = document.getElementById('c_data');
-            const hoje = new Date();
-            for(let i=1; i<=45; i++) {
-                let d = new Date();
-                d.setDate(hoje.getDate() + i);
-                let iso = d.toISOString().split('T')[0];
-                let diaSemana = d.getDay(); 
-                if(diaSemana >= 1 && diaSemana <= 4 && !FERIADOS.includes(iso)) {
-                    let texto = d.toLocaleDateString('pt-BR', {weekday: 'short', day: '2-digit', month: '2-digit'});
-                    selData.add(new Option(texto.toUpperCase(), iso));
-                }
-            }
-            const selHora = document.getElementById('c_hora');
-            for(let h=12; h<=21; h++) {
-                ["00", "30"].forEach(m => {
-                    if(h === 21 && m === "30") selHora.add(new Option("21:30", "21:30"));
-                    else if(h < 22) selHora.add(new Option(`${h}:${m}`, `${h}:${m}`));
-                });
-            }
-        }
-
-        function ir(v) {
-            if(v === 'loja' && prompt("Senha ADM:") !== "9002") return;
-            document.getElementById('portal').classList.add('hidden');
-            document.getElementById('btnHome').classList.remove('hidden');
-            document.getElementById('view-'+v).classList.remove('hidden');
-            if(v === 'loja') renderAdm();
-        }
-
-        function calc() {
-            const bolo = document.getElementById('c_bolo').value, 
-                  qtdInput = document.getElementById('c_qtd'),
-                  nome = document.getElementById('c_nome').value, 
-                  tel = document.getElementById('c_tel').value, 
-                  data = document.getElementById('c_data').value, 
-                  hora = document.getElementById('c_hora').value,
-                  btn = document.getElementById('btnWhatsApp'),
-                  msgErro = document.getElementById('msgErroQtd');
-            
-            let qtd = parseInt(qtdInput.value) || 0;
-            const kg = parseFloat(document.getElementById('c_kg').value) || 0;
-            const pixPanel = document.getElementById('painelFinanceiro'), cortesiaMsg = document.getElementById('msgCortesia');
-            let sinalExigido = false;
-
-            // Validação visual sem travar a digitação
-            if (qtd < 10 && qtdInput.value !== "") msgErro.classList.remove('hidden');
-            else msgErro.classList.add('hidden');
-
-            if(bolo === 'sim') {
-                document.getElementById('secaoBolo').classList.remove('hidden');
-                let kgPago = (qtd >= 10) ? Math.max(0, kg - 1) : kg;
-                valorSinalGlobal = (kgPago * VALOR_KG) / 2;
-                if (valorSinalGlobal > 0) {
-                    pixPanel.classList.remove('hidden'); cortesiaMsg.classList.add('hidden');
-                    document.getElementById('valorInfo').innerHTML = `Sinal 50% encomenda/excesso: <br> R$ ${valorSinalGlobal.toFixed(2)}`;
-                    sinalExigido = !sinalOk;
-                } else { pixPanel.classList.add('hidden'); cortesiaMsg.classList.remove('hidden'); sinalExigido = false; }
-            } else { document.getElementById('secaoBolo').classList.add('hidden'); valorSinalGlobal = 0; }
-            
-            btn.disabled = !(nome.length > 3 && tel.length > 8 && data !== "" && hora !== "" && qtd >= 10 && !sinalExigido);
-        }
-
-        function copiarPix() { navigator.clipboard.writeText(PIX_STRING); alert("Pix Copiado!"); }
-        function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
-
-        function enviar() {
-            const res = { id: Date.now(), nome: document.getElementById('c_nome').value, tel: document.getElementById('c_tel').value.replace(/\D/g,''), data: document.getElementById('c_data').value, hora: document.getElementById('c_hora').value, qtd: document.getElementById('c_qtd').value, sabor: document.getElementById('c_sabor').value, bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não', sinal: valorSinalGlobal, status: 'pendente' };
-            db.push(res); localStorage.setItem('nc_v3', JSON.stringify(db));
-            let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal para este número.*` : "";
-            const msg = `*RESERVA NOSSA CARNE*\n\n👤 *Cliente:* ${res.nome}\n📅 *Data:* ${res.data.split('-').reverse().join('/')}\n⏰ *Hora:* ${res.hora}\n👥 *Pessoas:* ${res.qtd}\n🎂 *Bolo:* ${res.bolo}\n💰 *Sinal:* R$ ${res.sinal.toFixed(2)}${msgSinal}`;
-            window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msg)}`);
-        }
-
-        function alternarStatus(id) {
-            const r = db.find(x => x.id == id);
-            r.status = r.status === 'pendente' ? 'confirmado' : 'pendente';
-            localStorage.setItem('nc_v3', JSON.stringify(db));
-            renderAdm();
-        }
-
-        function renderAdm(filtro = 'todos') {
-            const list = document.getElementById('listaAdm');
-            list.innerHTML = "";
-            const hoje = new Date().toISOString().split('T')[0];
-            let filtrados = db.sort((a,b) => new Date(a.data) - new Date(b.data));
-            if(filtro === 'hoje') filtrados = filtrados.filter(r => r.data === hoje);
-            if(!filtrados.length) { list.innerHTML = "<p>Nenhuma reserva.</p>"; return; }
-
-            filtrados.forEach(r => {
-                const isConflito = db.filter(x => x.data === r.data && x.hora === r.hora).length > 1;
-                const statusCls = r.status === 'confirmado' ? 'status-confirmado' : 'status-pendente';
-                const msgWpp = encodeURIComponent(`Olá ${r.nome}, sou da Nossa Carne. Confirmamos sua reserva para ${r.data.split('-').reverse().join('/')} às ${r.hora}?`);
-                list.innerHTML += `
-                <div class="reserva-card-adm">
-                    <span class="status-badge ${statusCls}">${r.status}</span>
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div><b>${r.nome.toUpperCase()}</b><br><small>📱 ${r.tel}</small></div>
-                        <div>
-                            <button onclick="alternarStatus(${r.id})" style="background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-check"></i></button>
-                            <button onclick="window.open('https://wa.me/55${r.tel}?text=${msgWpp}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>
-                            <button onclick="imprimir('${r.id}')" style="background:var(--ios-blue); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-print"></i></button>
-                            <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; margin-left:10px; cursor:pointer;"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div style="font-size:13px; margin-top:5px; color:#555">📅 ${r.data.split('-').reverse().join('/')} às ${r.hora}<br>👥 ${r.qtd} pessoas | 🎂 ${r.bolo}</div>
-                    ${isConflito ? `<div class="alerta-conflito">⚠️ Outra reserva no mesmo horário!</div>` : ''}
-                </div>`;
-            });
-        }
-
-        function imprimir(id) {
-            const r = db.find(x => x.id == id);
-            const area = document.getElementById('printArea');
-            area.innerHTML = `<div style="text-align:center;"><h1>NOSSA CARNE</h1><p>RESERVA</p><hr><p>DATA: ${r.data.split('-').reverse().join('/')}</p><p>CLIENTE: ${r.nome.toUpperCase()}</p><p>PESSOAS: ${r.qtd}</p><p>BOLO: ${r.bolo}</p><p>SINAL PAGO: R$ ${r.sinal.toFixed(2)}</p><hr></div>`;
-            setTimeout(() => { window.print(); }, 600);
-        }
-
-        function apagar(id) { if(confirm("Remover?")) { db = db.filter(x => x.id != id); localStorage.setItem('nc_v3', JSON.stringify(db)); renderAdm(); } }
-    </script>
-</body>
-</html>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                <h3
