@@ -1,347 +1,346 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Reserva Nossa Carne</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@400;600;700&family=Courier+Prime&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Reserva Nossa Carne</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@400;600;700&family=Courier+Prime&display=swap" rel="stylesheet">
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <style>
-        :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; --warning: #f1c40f; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100%; }
-        .hidden { display: none !important; }
-        
-        #portal { height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png'); background-size: cover; background-position: center; text-align: center; padding: 20px; }
-        .logo-main { width: 180px; max-width: 80%; margin-bottom: 20px; border-radius: 20px; border: 2px solid var(--gold); background: #fff; }
-        .portal-title { font-family: 'Montserrat', sans-serif; font-size: 22px; color: #fff; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 8px; font-style: italic; }
-        
-        .btn-portal { width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
-        .btn-c { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); }
-        .btn-l { background: #333; color: #fff; border: 1px solid #444; }
+    <style>
+        :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; --warning: #f1c40f; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100%; }
+        .hidden { display: none !important; }
+        
+        #portal { height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png'); background-size: cover; background-position: center; text-align: center; padding: 20px; }
+        .logo-main { width: 180px; max-width: 80%; margin-bottom: 20px; border-radius: 20px; border: 2px solid var(--gold); background: #fff; }
+        .portal-title { font-family: 'Montserrat', sans-serif; font-size: 22px; color: #fff; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 8px; font-style: italic; }
+        
+        .btn-portal { width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
+        .btn-c { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); }
+        .btn-l { background: #333; color: #fff; border: 1px solid #444; }
 
-        #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; width: 100%; padding: 70px 15px 30px; display: flex; flex-direction: column; align-items: center; }
-        .card-cliente { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: 0 auto; }
-        .regras-box { background: #fff5f5; border-left: 5px solid var(--primary); padding: 15px; border-radius: 12px; font-size: 11px; margin-bottom: 20px; line-height: 1.6; }
-        
-        label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; color: #333; outline: none; }
-        .grid-mobile { display: flex; gap: 10px; width: 100%; }
-        .grid-mobile > div { flex: 1; }
+        #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; width: 100%; padding: 70px 15px 30px; display: flex; flex-direction: column; align-items: center; }
+        .card-cliente { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: 0 auto; }
+        .regras-box { background: #fff5f5; border-left: 5px solid var(--primary); padding: 15px; border-radius: 12px; font-size: 11px; margin-bottom: 20px; line-height: 1.6; }
+        
+        label { font-weight: 600; font-size: 13px; display: block; margin-top: 15px; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 15px; color: #333; outline: none; }
+        .grid-mobile { display: flex; gap: 10px; width: 100%; }
+        .grid-mobile > div { flex: 1; }
 
-        .pix-box { background: #fff9db; border: 2px dashed #f59f00; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; width: 100%; }
-        .pix-code-display { background: #fff; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 10px; margin: 10px 0; border: 1px solid #ddd; color: #333; word-break: break-all; }
-        
-        .btn-enviar-final { width: 100%; padding: 18px; background: var(--success); color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-enviar-final:disabled { background: #ccc; }
+        .pix-box { background: #fff9db; border: 2px dashed #f59f00; padding: 15px; border-radius: 15px; text-align: center; margin-top: 15px; width: 100%; }
+        .pix-code-display { background: #fff; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 10px; margin: 10px 0; border: 1px solid #ddd; color: #333; word-break: break-all; }
+        
+        .btn-enviar-final { width: 100%; padding: 18px; background: var(--success); color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-enviar-final:disabled { background: #ccc; }
 
-        .btn-home { position: fixed; top: 15px; left: 15px; z-index: 2000; background: #000; color: #fff; padding: 10px 18px; border-radius: 25px; border: none; font-size: 12px; cursor: pointer; }
+        .btn-home { position: fixed; top: 15px; left: 15px; z-index: 2000; background: #000; color: #fff; padding: 10px 18px; border-radius: 25px; border: none; font-size: 12px; cursor: pointer; }
 
-        #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; width: 100%; padding: 70px 15px; }
-        .reserva-card-adm { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; position: relative; }
-        
-        .status-badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: inline-block; }
-        .status-pendente { background: var(--warning); color: #000; }
-        .status-confirmado { background: var(--success); color: #fff; }
-        .alerta-conflito { background: #ffeded; color: #c0392b; font-size: 11px; padding: 5px; border-radius: 5px; margin-top: 5px; border: 1px solid #ffcccc; font-weight: bold; }
+        #view-loja { background: var(--ios-bg); color: #000; min-height: 100vh; width: 100%; padding: 70px 15px; }
+        .reserva-card-adm { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; position: relative; }
+        
+        .status-badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: inline-block; }
+        .status-pendente { background: var(--warning); color: #000; }
+        .status-confirmado { background: var(--success); color: #fff; }
+        .alerta-conflito { background: #ffeded; color: #c0392b; font-size: 11px; padding: 5px; border-radius: 5px; margin-top: 5px; border: 1px solid #ffcccc; font-weight: bold; }
 
-        #printArea { display: none; }
-        @media print { body * { display: none !important; } #printArea { display: block !important; color: #000 !important; background: #fff !important; font-family: 'Courier Prime', monospace !important; padding: 20px; font-size: 14px; } #printArea * { display: block !important; margin-bottom: 5px; } }
-    </style>
+        #printArea { display: none; }
+        @media print { body * { display: none !important; } #printArea { display: block !important; color: #000 !important; background: #fff !important; font-family: 'Courier Prime', monospace !important; padding: 20px; font-size: 14px; } #printArea * { display: block !important; margin-bottom: 5px; } }
+    </style>
 </head>
 <body>
 
-    <div id="portal">
-        <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main">
-        <div class="portal-title">Reserva Nossa Carne</div>
-        <button class="btn-portal btn-c" id="btnIrCliente" onclick="ir('cliente')"><i class="fas fa-utensils"></i> NOVA RESERVA</button>
-        <button class="btn-portal btn-l" id="btnIrLoja" onclick="ir('loja')"><i class="fas fa-lock"></i> PAINEL ADM</button>
-    </div>
+    <div id="portal">
+        <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main">
+        <div class="portal-title">Reserva Nossa Carne</div>
+        <button class="btn-portal btn-c" id="btnIrCliente" onclick="ir('cliente')"><i class="fas fa-utensils"></i> NOVA RESERVA</button>
+        <button class="btn-portal btn-l" id="btnIrLoja" onclick="ir('loja')"><i class="fas fa-lock"></i> PAINEL ADM</button>
+    </div>
 
-    <button id="btnHome" class="btn-home hidden" onclick="location.reload()">VOLTAR</button>
+    <button id="btnHome" class="btn-home hidden" onclick="location.reload()">VOLTAR</button>
 
-    <div id="view-cliente" class="hidden">
-        <div class="card-cliente">
-            <h3 style="text-align:center; color:var(--primary); margin-top:0;">Nova Reserva</h3>
-            <div class="regras-box">
-                <b>REGRAS DA CASA:</b><br>
-                • <B>Reservas</B> : a partir de <b>10 pessoas</b>.<br>
-                • <b>Horário</b> : <b>12h às 21:30</b> (Seg a Qui).<br>
-                • <b>Bolo Cortesia</b>: 10+ pessoas ganha 1kg grátis.<br>
-                • <b>Sinal:</b> 50% se houver encomenda de bolo.<br>
-                • <b>Valor do Bolo</b> : R$ 95,00kg
-            </div>
+    <div id="view-cliente" class="hidden">
+        <div class="card-cliente">
+            <h3 style="text-align:center; color:var(--primary); margin-top:0;">Nova Reserva</h3>
+            <div class="regras-box">
+                <b>REGRAS DA CASA:</b><br>
+                • <B>Reservas</B> : a partir de <b>10 pessoas</b>.<br>
+                • <b>Horário</b> : <b>12h às 21:30</b> (Seg a Qui).<br>
+                • <b>Bolo Cortesia</b>: 10+ pessoas ganha 1kg grátis.<br>
+                • <b>Sinal:</b> 50% se houver encomenda de bolo.<br>
+                • <b>Valor do Bolo</b> : R$ 95,00kg
+            </div>
 
-            <label>Nome Completo</label>
-            <input type="text" id="c_nome" placeholder="Seu nome" oninput="calc()">
-            <label>(DDD) Telefone</label>
-            <input type="tel" id="c_tel" placeholder="11999999999" oninput="calc()">
-            
-            <label>Data da Reserva</label>
-            <select id="c_data" onchange="calc()">
-                <option value="">Selecione a Data</option>
-            </select>
+            <label>Nome Completo</label>
+            <input type="text" id="c_nome" placeholder="Seu nome" oninput="calc()">
+            <label>(DDD) Telefone</label>
+            <input type="tel" id="c_tel" placeholder="11999999999" oninput="calc()">
+            
+            <label>Data da Reserva</label>
+            <select id="c_data" onchange="calc()">
+                <option value="">Selecione a Data</option>
+            </select>
 
-            <div class="grid-mobile">
-                <div>
-                    <label>Hora</label>
-                    <select id="c_hora" onchange="calc()">
-                        <option value="">--:--</option>
-                    </select>
-                </div>
-                <div><label>Pessoas</label><input type="number" id="c_qtd" value="10" min="10" oninput="calc()"></div>
-            </div>
+            <div class="grid-mobile">
+                <div>
+                    <label>Hora</label>
+                    <select id="c_hora" onchange="calc()">
+                        <option value="">--:--</option>
+                    </select>
+                </div>
+                <div><label>Pessoas</label><input type="number" id="c_qtd" value="10" min="10" oninput="calc()"></div>
+            </div>
 
-            <label>Encomendar Bolo da Casa?</label>
-            <select id="c_bolo" onchange="calc()">
-                <option value="nao">Não</option>
-                <option value="sim">Sim 🎂</option>
-            </select>
+            <label>Encomendar Bolo da Casa?</label>
+            <select id="c_bolo" onchange="calc()">
+                <option value="nao">Não</option>
+                <option value="sim">Sim 🎂</option>
+            </select>
 
-            <div id="secaoBolo" class="hidden">
-                <label>Sabor do Bolo</label>
-                <select id="c_sabor">
-                    <option>Brigadeiro</option>
-                    <option>Ninho com Nutella</option>
-                    <option>Ninho com Morango</option>
-                    <option>Mousse de Chocolate</option>
-                    <option>Prestígio</option>
-                </select>
-                <label>Peso Total (Kg)</label>
-                <input type="number" id="c_kg" value="1" min="1" step="0.5" oninput="calc()">
+            <div id="secaoBolo" class="hidden">
+                <label>Sabor do Bolo</label>
+                <select id="c_sabor">
+                    <option>Brigadeiro</option>
+                    <option>Ninho com Nutella</option>
+                    <option>Ninho com Morango</option>
+                    <option>Mousse de Chocolate</option>
+                    <option>Prestígio</option>
+                </select>
+                <label>Peso Total (Kg)</label>
+                <input type="number" id="c_kg" value="1" min="1" step="0.5" oninput="calc()">
 
-                <div id="painelFinanceiro" class="pix-box hidden">
-                    <p style="margin:0; font-weight:bold; color:#d35400; font-size:12px;">PAGAMENTO DO SINAL</p>
-                    <img id="qrCode" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9" width="140" style="margin:10px auto; border: 4px solid #fff; border-radius: 10px; display:block;">
-                    <div class="pix-code-display" id="pixCopiaCola">00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9</div>
-                    <button onclick="copiarPix()" style="background:#f39c12; border:none; color:#fff; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">COPIAR PIX</button>
-                    <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 14px; color:var(--primary); background: #fff; padding: 8px; border-radius: 5px;"></div>
-                    
-                    <div id="avisoComprovante" style="font-size: 11px; color: #c0392b; margin: 10px 0; font-weight: bold; text-transform: uppercase;">
-                        ⚠️ Após finalizar, envie o comprovante via WhatsApp.
-                    </div>
-                    <button id="btnConfirmSinal" onclick="confirmarSinal()" style="width:100%; padding:15px; background:var(--ios-blue); border:none; color:#fff; border-radius:12px; font-weight:bold; cursor:pointer;">JÁ REALIZEI O PIX</button>
-                </div>
-            </div>
+                <div id="painelFinanceiro" class="pix-box hidden">
+                    <p style="margin:0; font-weight:bold; color:#d35400; font-size:12px;">PAGAMENTO DO SINAL</p>
+                    <img id="qrCode" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9" width="140" style="margin:10px auto; border: 4px solid #fff; border-radius: 10px; display:block;">
+                    <div class="pix-code-display" id="pixCopiaCola">00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9</div>
+                    <button onclick="copiarPix()" style="background:#f39c12; border:none; color:#fff; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">COPIAR PIX</button>
+                    <div id="valorInfo" style="margin: 10px 0; font-weight: bold; font-size: 14px; color:var(--primary); background: #fff; padding: 8px; border-radius: 5px;"></div>
+                    
+                    <div id="avisoComprovante" style="font-size: 11px; color: #c0392b; margin: 10px 0; font-weight: bold; text-transform: uppercase;">
+                        ⚠️ Após finalizar, envie o comprovante via WhatsApp.
+                    </div>
+                    <button id="btnConfirmSinal" onclick="confirmarSinal()" style="width:100%; padding:15px; background:var(--ios-blue); border:none; color:#fff; border-radius:12px; font-weight:bold; cursor:pointer;">JÁ REALIZEI O PIX</button>
+                </div>
+            </div>
 
-            <button id="btnWhatsApp" class="btn-enviar-final" onclick="enviar()" disabled><i class="fab fa-whatsapp"></i> FINALIZAR RESERVA</button>
-            <p id="msgErroQtd" style="color:red; font-size:11px; text-align:center; margin-top:5px;" class="hidden">Mínimo de 10 pessoas.</p>
-        </div>
-    </div>
+            <button id="btnWhatsApp" class="btn-enviar-final" onclick="enviar()" disabled><i class="fab fa-whatsapp"></i> FINALIZAR RESERVA</button>
+            <p id="msgErroQtd" style="color:red; font-size:11px; text-align:center; margin-top:5px;" class="hidden">Mínimo de 10 pessoas.</p>
+        </div>
+    </div>
 
-    <div id="view-loja" class="hidden">
-        <div style="max-width:600px; margin:auto; width:95%;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                <h3 style="color:#000; margin:0;">Monitor ADM</h3>
-                <div>
-                    <button onclick="renderAdm('hoje')" style="padding:8px; border-radius:8px; border:1px solid #ccc; cursor:pointer; font-size:12px; background:#fff;">Hoje</button>
-                    <button onclick="renderAdm('todos')" style="padding:8px; border-radius:8px; border:1px solid #ccc; cursor:pointer; font-size:12px; background:#fff;">Tudo</button>
-                </div>
-            </div>
-            <div id="listaAdm">Carregando reservas...</div>
-        </div>
-    </div>
+    <div id="view-loja" class="hidden">
+        <div style="max-width:600px; margin:auto; width:95%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                <h3 style="color:#000; margin:0;">Monitor ADM</h3>
+                <div>
+                    <button onclick="renderAdm('hoje')" style="padding:8px; border-radius:8px; border:1px solid #ccc; cursor:pointer; font-size:12px; background:#fff;">Hoje</button>
+                    <button onclick="renderAdm('todos')" style="padding:8px; border-radius:8px; border:1px solid #ccc; cursor:pointer; font-size:12px; background:#fff;">Tudo</button>
+                </div>
+            </div>
+            <div id="listaAdm">Carregando reservas...</div>
+        </div>
+    </div>
 
-    <div id="printArea"></div>
+    <div id="printArea"></div>
 
-    <script>
-        // CONFIGURAÇÃO FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyCCEWs1FvE4TF7dzIDjG3f6C9GmM6VKsrE",
-            authDomain: "nossa-carne-fea04.firebaseapp.com",
-            projectId: "nossa-carne-fea04",
-            storageBucket: "nossa-carne-fea04.firebasestorage.app",
-            messagingSenderId: "5141362228",
-            appId: "1:5141362228:web:69424a0391c8ca3d9389f3",
-            measurementId: "G-0E1XTDECP7"
-        };
-        
-        // Inicialização Segura
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
+    <script>
+        // CONFIGURAÇÃO FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCEWs1FvE4TF7dzIDjG3f6C9GmM6VKsrE",
+            authDomain: "nossa-carne-fea04.firebaseapp.com",
+            projectId: "nossa-carne-fea04",
+            storageBucket: "nossa-carne-fea04.firebasestorage.app",
+            messagingSenderId: "5141362228",
+            appId: "1:5141362228:web:69424a0391c8ca3d9389f3",
+            measurementId: "G-0E1XTDECP7"
+        };
+        
+        // Inicialização Segura
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
 
-        const PIX_STRING = "00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9";
-        const VALOR_KG = 95.00;
-        const FERIADOS = ["2026-01-01", "2026-12-25"];
-        let sinalOk = false;
-        let valorSinalGlobal = 0;
-        let reservasNuvem = [];
+        const PIX_STRING = "00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9";
+        const VALOR_KG = 95.00;
+        const FERIADOS = ["2026-01-01", "2026-12-25"];
+        let sinalOk = false;
+        let valorSinalGlobal = 0;
+        let reservasNuvem = [];
 
-        window.onload = function() {
-            gerarOpcoes();
-        };
+        window.onload = function() {
+            gerarOpcoes();
+        };
 
-        function gerarOpcoes() {
-            const selData = document.getElementById('c_data');
-            const hoje = new Date();
-            for(let i=1; i<=45; i++) {
-                let d = new Date(); d.setDate(hoje.getDate() + i);
-                let iso = d.toISOString().split('T')[0];
-                if(d.getDay() >= 1 && d.getDay() <= 4 && !FERIADOS.includes(iso)) {
-                    selData.add(new Option(d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}).toUpperCase(), iso));
-                }
-            }
-            const selHora = document.getElementById('c_hora');
-            for(let h=12; h<=21; h++) {
-                ["00", "30"].forEach(m => selHora.add(new Option(`${h}:${m}`, `${h}:${m}`)));
-            }
-        }
+        function gerarOpcoes() {
+            const selData = document.getElementById('c_data');
+            const hoje = new Date();
+            for(let i=1; i<=45; i++) {
+                let d = new Date(); d.setDate(hoje.getDate() + i);
+                let iso = d.toISOString().split('T')[0];
+                if(d.getDay() >= 1 && d.getDay() <= 4 && !FERIADOS.includes(iso)) {
+                    selData.add(new Option(d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}).toUpperCase(), iso));
+                }
+            }
+            const selHora = document.getElementById('c_hora');
+            for(let h=12; h<=21; h++) {
+                ["00", "30"].forEach(m => selHora.add(new Option(`${h}:${m}`, `${h}:${m}`)));
+            }
+        }
 
-        function ir(v) {
-            if(v === 'loja' && prompt("Senha ADM:") !== "9002") return;
-            document.getElementById('portal').classList.add('hidden');
-            document.getElementById('view-cliente').classList.add('hidden');
-            document.getElementById('view-loja').classList.add('hidden');
-            document.getElementById('btnHome').classList.remove('hidden');
-            document.getElementById('view-'+v).classList.remove('hidden');
-            if(v === 'loja') monitorarReservas();
-        }
+        function ir(v) {
+            if(v === 'loja' && prompt("Senha ADM:") !== "9002") return;
+            document.getElementById('portal').classList.add('hidden');
+            document.getElementById('view-cliente').classList.add('hidden');
+            document.getElementById('view-loja').classList.add('hidden');
+            document.getElementById('btnHome').classList.remove('hidden');
+            document.getElementById('view-'+v).classList.remove('hidden');
+            if(v === 'loja') monitorarReservas();
+        }
 
-        function calc() {
-            const bolo = document.getElementById('c_bolo').value, qtdInput = document.getElementById('c_qtd'),
-                  nome = document.getElementById('c_nome').value, tel = document.getElementById('c_tel').value,
-                  data = document.getElementById('c_data').value, hora = document.getElementById('c_hora').value,
-                  btn = document.getElementById('btnWhatsApp'), msgErro = document.getElementById('msgErroQtd');
-            
-            let qtd = parseInt(qtdInput.value) || 0;
-            const kg = parseFloat(document.getElementById('c_kg').value) || 0;
-            let sinalExigido = false;
+        function calc() {
+            const bolo = document.getElementById('c_bolo').value, qtdInput = document.getElementById('c_qtd'),
+                  nome = document.getElementById('c_nome').value, tel = document.getElementById('c_tel').value,
+                  data = document.getElementById('c_data').value, hora = document.getElementById('c_hora').value,
+                  btn = document.getElementById('btnWhatsApp'), msgErro = document.getElementById('msgErroQtd');
+            
+            let qtd = parseInt(qtdInput.value) || 0;
+            const kg = parseFloat(document.getElementById('c_kg').value) || 0;
+            let sinalExigido = false;
 
-            if (qtd < 10 && qtdInput.value !== "") msgErro.classList.remove('hidden');
-            else msgErro.classList.add('hidden');
+            if (qtd < 10 && qtdInput.value !== "") msgErro.classList.remove('hidden');
+            else msgErro.classList.add('hidden');
 
-            if(bolo === 'sim') {
-                document.getElementById('secaoBolo').classList.remove('hidden');
-                let kgPago = (qtd >= 10) ? Math.max(0, kg - 1) : kg;
-                valorSinalGlobal = (kgPago * VALOR_KG) / 2;
-                if (valorSinalGlobal > 0) {
-                    document.getElementById('painelFinanceiro').classList.remove('hidden');
-                    document.getElementById('valorInfo').innerHTML = `Sinal 50%: R$ ${valorSinalGlobal.toFixed(2)}`;
-                    sinalExigido = !sinalOk;
-                } else { document.getElementById('painelFinanceiro').classList.add('hidden'); sinalExigido = false; }
-            } else { document.getElementById('secaoBolo').classList.add('hidden'); valorSinalGlobal = 0; }
-            
-            btn.disabled = !(nome.length > 3 && tel.length > 8 && data !== "" && hora !== "" && qtd >= 10 && !sinalExigido);
-        }
+            if(bolo === 'sim') {
+                document.getElementById('secaoBolo').classList.remove('hidden');
+                let kgPago = (qtd >= 10) ? Math.max(0, kg - 1) : kg;
+                valorSinalGlobal = (kgPago * VALOR_KG) / 2;
+                if (valorSinalGlobal > 0) {
+                    document.getElementById('painelFinanceiro').classList.remove('hidden');
+                    document.getElementById('valorInfo').innerHTML = `Sinal 50%: R$ ${valorSinalGlobal.toFixed(2)}`;
+                    sinalExigido = !sinalOk;
+                } else { document.getElementById('painelFinanceiro').classList.add('hidden'); sinalExigido = false; }
+            } else { document.getElementById('secaoBolo').classList.add('hidden'); valorSinalGlobal = 0; }
+            
+            btn.disabled = !(nome.length > 3 && tel.length > 8 && data !== "" && hora !== "" && qtd >= 10 && !sinalExigido);
+        }
 
-        function copiarPix() { navigator.clipboard.writeText(PIX_STRING); alert("Pix Copiado!"); }
-        function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
+        function copiarPix() { navigator.clipboard.writeText(PIX_STRING); alert("Pix Copiado!"); }
+        function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
 
-        async function enviar() {
-            const btn = document.getElementById('btnWhatsApp');
-            btn.disabled = true;
-            btn.innerText = "ENVIANDO...";
+        async function enviar() {
+            const btn = document.getElementById('btnWhatsApp');
+            btn.disabled = true;
+            btn.innerText = "ENVIANDO...";
 
-            const res = {
-                nome: document.getElementById('c_nome').value,
-                tel: document.getElementById('c_tel').value.replace(/\D/g,''),
-                data: document.getElementById('c_data').value,
-                hora: document.getElementById('c_hora').value,
-                qtd: document.getElementById('c_qtd').value,
-                sabor: document.getElementById('c_sabor').value || 'N/A',
-                bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não',
-                sinal: valorSinalGlobal,
-                status: 'pendente',
-                criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-            };
+            const res = {
+                nome: document.getElementById('c_nome').value,
+                tel: document.getElementById('c_tel').value.replace(/\D/g,''),
+                data: document.getElementById('c_data').value,
+                hora: document.getElementById('c_hora').value,
+                qtd: document.getElementById('c_qtd').value,
+                sabor: document.getElementById('c_sabor').value || 'N/A',
+                bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não',
+                sinal: valorSinalGlobal,
+                status: 'pendente',
+                criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+            };
 
-            try {
-                await db.collection("reservas").add(res);
-                alert("Reserva enviada com sucesso!");
-                let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal.*` : "";
-                const msgText = `*RESERVA NOSSA CARNE*\n👤 ${res.nome}\n📅 ${res.data.split('-').reverse().join('/')}\n⏰ ${res.hora}\n👥 ${res.qtd} pessoas\n🎂 Bolo: ${res.bolo}\n💰 Sinal: R$ ${res.sinal.toFixed(2)}${msgSinal}`;
-                window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msgText)}`);
-                location.reload(); 
-            } catch (e) { 
-                alert("Erro ao salvar: " + e); 
-                btn.disabled = false;
-                btn.innerText = "TENTAR NOVAMENTE";
-            }
-        }
+            try {
+                await db.collection("reservas").add(res);
+                alert("Reserva enviada com sucesso!");
+                let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal.*` : "";
+                const msgText = `*RESERVA NOSSA CARNE*\n👤 ${res.nome}\n📅 ${res.data.split('-').reverse().join('/')}\n⏰ ${res.hora}\n👥 ${res.qtd} pessoas\n🎂 Bolo: ${res.bolo}\n💰 Sinal: R$ ${res.sinal.toFixed(2)}${msgSinal}`;
+                window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msgText)}`);
+                location.reload(); 
+            } catch (e) { 
+                alert("Erro ao salvar: " + e); 
+                btn.disabled = false;
+                btn.innerText = "TENTAR NOVAMENTE";
+            }
+        }
 
-        function monitorarReservas() {
-            db.collection("reservas").orderBy("data", "asc").onSnapshot((snapshot) => {
-                reservasNuvem = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderAdm();
-            }, (error) => {
-                document.getElementById('listaAdm').innerText = "Erro ao carregar: Verifique as Regras Firestore.";
-            });
-        }
+        function monitorarReservas() {
+            db.collection("reservas").orderBy("data", "asc").onSnapshot((snapshot) => {
+                reservasNuvem = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAdm();
+            }, (error) => {
+                document.getElementById('listaAdm').innerText = "Erro ao carregar: Verifique as Regras Firestore.";
+            });
+        }
 
-        function alternarStatus(id, statusAtual) {
-            db.collection("reservas").doc(id).update({ status: statusAtual === 'pendente' ? 'confirmado' : 'pendente' });
-        }
+        function alternarStatus(id, statusAtual) {
+            db.collection("reservas").doc(id).update({ status: statusAtual === 'pendente' ? 'confirmado' : 'pendente' });
+        }
 
-        function apagar(id) { if(confirm("Remover esta reserva definitivamente?")) db.collection("reservas").doc(id).delete(); }
+        function apagar(id) { if(confirm("Remover esta reserva definitivamente?")) db.collection("reservas").doc(id).delete(); }
 
-        // NOVA FUNÇÃO DE IMPRESSÃO DA COMANDA
-        function imprimirComanda(id) {
-            const r = reservasNuvem.find(res => res.id === id);
-            if(!r) return;
-            
-            const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
-            const htmlComanda = `
-                <div style="text-align:center; font-weight:bold; font-size:20px; margin-bottom:5px;">NOSSA CARNE</div>
-                <div style="text-align:center; font-size:14px; margin-bottom:15px; text-transform:uppercase;">Comanda de Reserva</div>
-                <div style="border-bottom:1px dashed #000; margin-bottom:10px;"></div>
-                <div><b>CLIENTE:</b> ${r.nome.toUpperCase()}</div>
-                <div><b>TELEFONE:</b> ${r.tel}</div>
-                <div><b>DATA:</b> ${dataFormat}</div>
-                <div><b>HORA:</b> ${r.hora}h</div>
-                <div><b>PESSOAS:</b> ${r.qtd}</div>
-                <div style="border-bottom:1px dashed #000; margin:10px 0;"></div>
-                <div><b>BOLO:</b> ${r.bolo}</div>
-                <div><b>SABOR:</b> ${r.sabor || 'N/A'}</div>
-                <div><b>SINAL (PAGO):</b> R$ ${parseFloat(r.sinal || 0).toFixed(2)}</div>
-                <div><b>STATUS:</b> ${r.status.toUpperCase()}</div>
-                <div style="border-bottom:1px dashed #000; margin:10px 0;"></div>
-                <div style="text-align:center; font-size:11px; margin-top:10px;">Impresso em: ${new Date().toLocaleString('pt-BR')}</div>
-            `;
-            
-            document.getElementById('printArea').innerHTML = htmlComanda;
-            window.print();
-        }
+        function imprimirComanda(id) {
+            const r = reservasNuvem.find(res => res.id === id);
+            if(!r) return;
+            
+            const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
+            const htmlComanda = `
+                <div style="text-align:center; font-weight:bold; font-size:20px; margin-bottom:5px;">NOSSA CARNE</div>
+                <div style="text-align:center; font-size:14px; margin-bottom:15px; text-transform:uppercase;">Comanda de Reserva</div>
+                <div style="border-bottom:1px dashed #000; margin-bottom:10px;"></div>
+                <div><b>CLIENTE:</b> ${r.nome.toUpperCase()}</div>
+                <div><b>TELEFONE:</b> ${r.tel}</div>
+                <div><b>DATA:</b> ${dataFormat}</div>
+                <div><b>HORA:</b> ${r.hora}h</div>
+                <div><b>PESSOAS:</b> ${r.qtd}</div>
+                <div style="border-bottom:1px dashed #000; margin:10px 0;"></div>
+                <div><b>BOLO:</b> ${r.bolo}</div>
+                <div><b>SABOR:</b> ${r.sabor || 'N/A'}</div>
+                <div><b>SINAL (PAGO):</b> R$ ${parseFloat(r.sinal || 0).toFixed(2)}</div>
+                <div><b>STATUS:</b> ${r.status.toUpperCase()}</div>
+                <div style="border-bottom:1px dashed #000; margin:10px 0;"></div>
+                <div style="text-align:center; font-size:11px; margin-top:10px;">Impresso em: ${new Date().toLocaleString('pt-BR')}</div>
+            `;
+            
+            document.getElementById('printArea').innerHTML = htmlComanda;
+            window.print();
+        }
 
-        function renderAdm(filtro = 'todos') {
-            const list = document.getElementById('listaAdm');
-            list.innerHTML = "";
-            const hoje = new Date().toISOString().split('T')[0];
-            let filtrados = reservasNuvem;
-            if(filtro === 'hoje') filtrados = filtrados.filter(r => r.data === hoje);
+        function renderAdm(filtro = 'todos') {
+            const list = document.getElementById('listaAdm');
+            list.innerHTML = "";
+            const hoje = new Date().toISOString().split('T')[0];
+            let filtrados = reservasNuvem;
+            if(filtro === 'hoje') filtrados = filtrados.filter(r => r.data === hoje);
 
-            if(filtrados.length === 0) { list.innerHTML = "<p style='text-align:center;'>Nenhuma reserva.</p>"; return; }
+            if(filtrados.length === 0) { list.innerHTML = "<p style='text-align:center;'>Nenhuma reserva.</p>"; return; }
 
-            filtrados.forEach(r => {
-                const isConflito = filtrados.filter(x => x.data === r.data && x.hora === r.hora).length > 1;
-                const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
-                
-                const msgConfirmacao = `Olá ${r.nome}, tudo bem? Sou da Nossa Carne! Passando para confirmar sua reserva para o dia ${dataFormat} às ${r.hora}. Podemos confirmar?`;
-                const linkWpp = `https://wa.me/55${r.tel}?text=${encodeURIComponent(msgConfirmacao)}`;
+            filtrados.forEach(r => {
+                const isConflito = filtrados.filter(x => x.data === r.data && x.hora === r.hora).length > 1;
+                const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
+                
+                const msgConfirmacao = `Olá ${r.nome}, tudo bem? Sou da Nossa Carne! Passando para confirmar sua reserva para o dia ${dataFormat} às ${r.hora}. Podemos confirmar?`;
+                const linkWpp = `https://wa.me/55${r.tel}?text=${encodeURIComponent(msgConfirmacao)}`;
 
-                list.innerHTML += `
-                <div class="reserva-card-adm">
-                    <span class="status-badge ${r.status === 'confirmado' ? 'status-confirmado' : 'status-pendente'}">${r.status}</span>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div><b>${r.nome.toUpperCase()}</b><br><small>📱 ${r.tel}</small></div>
-                        <div>
-                            <button onclick="alternarStatus('${r.id}', '${r.status}')" style="background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-check"></i></button>
-                            <button onclick="window.open('${linkWpp}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>
-                            <button onclick="imprimirComanda('${r.id}')" style="background:#3498db; color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer; margin-left:5px;"><i class="fas fa-print"></i></button>
-                            <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; cursor:pointer; margin-left:5px;"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                    <div style="font-size:13px; color:#555; margin-top:5px;">📅 ${dataFormat} às ${r.hora} | 👥 ${r.qtd} | 🎂 ${r.bolo}</div>
-                    ${isConflito ? `<div class="alerta-conflito">⚠️ Outra reserva no mesmo horário!</div>` : ''}
-                </div>`;
-            });
-        }
-    </script>
+                list.innerHTML += `
+                <div class="reserva-card-adm">
+                    <span class="status-badge ${r.status === 'confirmado' ? 'status-confirmado' : 'status-pendente'}">${r.status}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div><b>${r.nome.toUpperCase()}</b><br><small>📱 ${r.tel}</small></div>
+                        <div>
+                            <button onclick="alternarStatus('${r.id}', '${r.status}')" style="background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-check"></i></button>
+                            <button onclick="window.open('${linkWpp}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>
+                            <button onclick="imprimirComanda('${r.id}')" style="background:#3498db; color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer; margin-left:5px;"><i class="fas fa-print"></i></button>
+                            <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; cursor:pointer; margin-left:5px;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div style="font-size:13px; color:#555; margin-top:5px;">📅 ${dataFormat} às ${r.hora} | 👥 ${r.qtd} | 🎂 ${r.bolo}</div>
+                    ${isConflito ? `<div class="alerta-conflito">⚠️ Outra reserva no mesmo horário!</div>` : ''}
+                </div>`;
+            });
+        }
+    </script>
 </body>
 </html>
