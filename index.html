@@ -10,7 +10,9 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script> <style>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <style>
         :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; --warning: #f1c40f; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100%; }
@@ -144,6 +146,7 @@
                 <div>
                     <button onclick="renderAdm('hoje')" style="padding:8px; border-radius:8px; border:1px solid #ccc; cursor:pointer; font-size:12px; background:#fff;">Hoje</button>
                     <button onclick="renderAdm('todos')" style="padding:8px; border-radius:8px; border:1px solid #ccc; cursor:pointer; font-size:12px; background:#fff;">Tudo</button>
+                    <button onclick="sairAdm()" style="padding:8px; border-radius:8px; border:none; background:var(--primary); color:#fff; cursor:pointer; font-size:12px; margin-left:5px;"><i class="fas fa-sign-out-alt"></i> Sair</button>
                 </div>
             </div>
             <div id="listaAdm">Carregando reservas...</div>
@@ -170,7 +173,7 @@
         }
         
         const db = firebase.firestore();
-        const auth = firebase.auth(); // AQUI: Inicialização do Firebase Authentication
+        const auth = firebase.auth(); 
 
         const PIX_STRING = "00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9";
         const VALOR_KG = 95.00;
@@ -199,7 +202,6 @@
             }
         }
 
-        // AQUI: Função auxiliar para controlar a troca de telas de forma mais limpa
         function mostrarTela(v) {
             document.getElementById('portal').classList.add('hidden');
             document.getElementById('view-cliente').classList.add('hidden');
@@ -208,7 +210,6 @@
             document.getElementById('view-'+v).classList.remove('hidden');
         }
 
-        // AQUI: Nova função ir(v) com a lógica de login real
         async function ir(v) {
             if (v === 'loja') {
                 if (auth.currentUser) {
@@ -235,6 +236,16 @@
                 return;
             }
             mostrarTela(v);
+        }
+
+        // AQUI: Nova função para deslogar do painel
+        function sairAdm() {
+            auth.signOut().then(() => {
+                alert("Você saiu do painel administrativo.");
+                location.reload(); 
+            }).catch((error) => {
+                console.error("Erro ao sair:", error);
+            });
         }
 
         function calc() {
