@@ -199,7 +199,7 @@
         }
 
         function ir(v) {
-            if(v === 'loja' && prompt("Senha ADM:") !== "9002") return;
+            if(v === 'loja' && btoa(prompt("Senha ADM:") || "") !== "OTAwMg==") return;
             document.getElementById('portal').classList.add('hidden');
             document.getElementById('view-cliente').classList.add('hidden');
             document.getElementById('view-loja').classList.add('hidden');
