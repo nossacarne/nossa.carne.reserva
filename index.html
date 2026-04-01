@@ -10,8 +10,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-    <style>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script> <style>
         :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; --warning: #f1c40f; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; min-height: 100vh; font-family: 'Poppins', sans-serif; background: #000; color: #fff; overflow-x: hidden; width: 100%; }
@@ -169,7 +168,9 @@
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
+        
         const db = firebase.firestore();
+        const auth = firebase.auth(); // AQUI: Inicialização do Firebase Authentication
 
         const PIX_STRING = "00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9";
         const VALOR_KG = 95.00;
@@ -198,14 +199,42 @@
             }
         }
 
-        function ir(v) {
-            if(v === 'loja' && btoa(prompt("Senha ADM:") || "") !== "OTAwMg==") return;
+        // AQUI: Função auxiliar para controlar a troca de telas de forma mais limpa
+        function mostrarTela(v) {
             document.getElementById('portal').classList.add('hidden');
             document.getElementById('view-cliente').classList.add('hidden');
             document.getElementById('view-loja').classList.add('hidden');
             document.getElementById('btnHome').classList.remove('hidden');
             document.getElementById('view-'+v).classList.remove('hidden');
-            if(v === 'loja') monitorarReservas();
+        }
+
+        // AQUI: Nova função ir(v) com a lógica de login real
+        async function ir(v) {
+            if (v === 'loja') {
+                if (auth.currentUser) {
+                    mostrarTela(v);
+                    monitorarReservas();
+                    return;
+                }
+
+                const emailAdmin = prompt("E-mail do Administrador:");
+                if (!emailAdmin) return;
+                
+                const senhaAdmin = prompt("Senha:");
+                if (!senhaAdmin) return;
+
+                try {
+                    await auth.signInWithEmailAndPassword(emailAdmin, senhaAdmin);
+                    alert("Login realizado com sucesso!");
+                    mostrarTela(v);
+                    monitorarReservas();
+                } catch (error) {
+                    alert("Acesso negado: E-mail ou senha incorretos.");
+                    console.error("Erro de login:", error.code);
+                }
+                return;
+            }
+            mostrarTela(v);
         }
 
         function calc() {
