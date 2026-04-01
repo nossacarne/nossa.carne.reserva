@@ -173,10 +173,10 @@
             firebase.initializeApp(firebaseConfig);
         }
         
-        // Inicialização do App Check (Nível 2 - Anti-Robôs)
+        // Inicialização do App Check (Nível 2 - Anti-Robôs) COM A CORREÇÃO DO PROVIDER
         const appCheck = firebase.appCheck();
         appCheck.activate(
-            6LcHDaIsAAAAAI3SjStb0LPRNmUchtM9yF4U6fPM,
+            new firebase.appCheck.ReCaptchaV3Provider(6LcHDaIsAAAAAI3SjStb0LPRNmUchtM9yF4U6fPM),
             true // true = Mantém o token atualizado automaticamente
         );
 
