@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check-compat.js"></script>
 
     <style>
         :root { --primary: #c0392b; --gold: #d4af37; --ios-blue: #007AFF; --ios-bg: #F2F2F7; --success: #25d366; --warning: #f1c40f; }
@@ -167,11 +168,18 @@
             measurementId: "G-0E1XTDECP7"
         };
         
-        // Inicialização Segura
+        // Inicialização Segura do Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         
+        // Inicialização do App Check (Nível 2 - Anti-Robôs)
+        const appCheck = firebase.appCheck();
+        appCheck.activate(
+            6LcHDaIsAAAAAI3SjStb0LPRNmUchtM9yF4U6fPM,
+            true // true = Mantém o token atualizado automaticamente
+        );
+
         const db = firebase.firestore();
         const auth = firebase.auth(); 
 
@@ -238,7 +246,6 @@
             mostrarTela(v);
         }
 
-        // AQUI: Nova função para deslogar do painel
         function sairAdm() {
             auth.signOut().then(() => {
                 alert("Você saiu do painel administrativo.");
