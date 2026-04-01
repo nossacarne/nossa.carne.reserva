@@ -168,20 +168,23 @@
             measurementId: "G-0E1XTDECP7"
         };
         
-        // Inicialização Segura do Firebase
+        // 1. Inicializa o Firebase primeiro
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         
-        // Inicialização do App Check (Nível 2 - Anti-Robôs) COM A CORREÇÃO DO PROVIDER
-        const appCheck = firebase.appCheck();
-        appCheck.activate(
-            new firebase.appCheck.ReCaptchaV3Provider(6LcHDaIsAAAAAI3SjStb0LPRNmUchtM9yF4U6fPM),
-            true // true = Mantém o token atualizado automaticamente
-        );
-
+        // 2. Inicializa o Banco e o Login (Antes do App Check para não quebrar os botões)
         const db = firebase.firestore();
         const auth = firebase.auth(); 
+
+        // 3. Inicializa o App Check numa "bolha" segura
+        try {
+            const appCheck = firebase.appCheck();
+            // Substitua 6LcHDaIsAAAAAI3SjStb0LPRNmUchtM9yF4U6fPM pela chave que você gerou no site do reCAPTCHA
+            appCheck.activate(6LcHDaIsAAAAAI3SjStb0LPRNmUchtM9yF4U6fPM, true);
+        } catch (erro) {
+            console.error("Aviso: O App Check não pôde ser iniciado agora.", erro);
+        }
 
         const PIX_STRING = "00020126510014br.gov.bcb.pix0114137919980001310211LORUSSOPROD5204000053039865802BR5914GERADOR%20DE%20PIX6009SAO%20PAULO62070503***6304F4F9";
         const VALOR_KG = 95.00;
