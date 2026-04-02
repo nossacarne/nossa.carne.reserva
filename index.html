@@ -291,14 +291,13 @@
         function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
 
         // ==========================================
-        // NOVA FUNÇÃO ENVIAR (CONECTADA AO SERVIDOR BACK-END)
+        // FUNÇÃO ENVIAR CONECTADA AO NOVO BACK-END NA RENDER
         // ==========================================
         async function enviar() {
             const btn = document.getElementById('btnWhatsApp');
             btn.disabled = true;
             btn.innerText = "ENVIANDO...";
 
-            // Monta o pacote de dados do cliente
             const res = {
                 nome: document.getElementById('c_nome').value,
                 tel: document.getElementById('c_tel').value.replace(/\D/g,''),
@@ -311,8 +310,8 @@
             };
 
             try {
-                // Envia para o seu Servidor Node.js rodando localmente
-                const respostaCozinha = await fetch('http://localhost:3000/api/reservas', {
+                // Seu site agora aponta para o servidor online na Render
+                const respostaCozinha = await fetch('https://nossacarne-api.onrender.com/api/reservas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(res)
@@ -334,7 +333,7 @@
                 }
 
             } catch (e) { 
-                alert("Erro de comunicação. O servidor no VS Code está ligado?"); 
+                alert("Erro de comunicação com o servidor."); 
                 console.error(e);
                 btn.disabled = false;
                 btn.innerText = "TENTAR NOVAMENTE";
