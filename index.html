@@ -177,7 +177,7 @@
         const db = firebase.firestore();
         const auth = firebase.auth(); 
 
-        // 3. Inicialização do App Check encapsulada com as ASPAS corrigidas
+        // 3. Inicialização do App Check encapsulada
         try {
             const appCheck = firebase.appCheck();
             appCheck.activate(
@@ -290,11 +290,15 @@
         function copiarPix() { navigator.clipboard.writeText(PIX_STRING); alert("Pix Copiado!"); }
         function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
 
+        // ==========================================
+        // NOVA FUNÇÃO ENVIAR (CONECTADA AO SERVIDOR BACK-END)
+        // ==========================================
         async function enviar() {
             const btn = document.getElementById('btnWhatsApp');
             btn.disabled = true;
             btn.innerText = "ENVIANDO...";
 
+            // Monta o pacote de dados do cliente
             const res = {
                 nome: document.getElementById('c_nome').value,
                 tel: document.getElementById('c_tel').value.replace(/\D/g,''),
@@ -303,20 +307,35 @@
                 qtd: document.getElementById('c_qtd').value,
                 sabor: document.getElementById('c_sabor').value || 'N/A',
                 bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não',
-                sinal: valorSinalGlobal,
-                status: 'pendente',
-                criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                sinal: valorSinalGlobal
             };
 
             try {
-                await db.collection("reservas").add(res);
-                alert("Reserva enviada com sucesso!");
-                let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal.*` : "";
-                const msgText = `*RESERVA NOSSA CARNE*\n👤 ${res.nome}\n📅 ${res.data.split('-').reverse().join('/')}\n⏰ ${res.hora}\n👥 ${res.qtd} pessoas\n🎂 Bolo: ${res.bolo}\n💰 Sinal: R$ ${res.sinal.toFixed(2)}${msgSinal}`;
-                window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msgText)}`);
-                location.reload(); 
+                // Envia para o seu Servidor Node.js rodando localmente
+                const respostaCozinha = await fetch('http://localhost:3000/api/reservas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(res)
+                });
+
+                const retorno = await respostaCozinha.json(); 
+
+                if (retorno.sucesso) {
+                    alert("Reserva processada com sucesso pelo nosso servidor!");
+                    
+                    let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal.*` : "";
+                    const msgText = `*RESERVA NOSSA CARNE*\n👤 ${res.nome}\n📅 ${res.data.split('-').reverse().join('/')}\n⏰ ${res.hora}\n👥 ${res.qtd} pessoas\n🎂 Bolo: ${res.bolo}\n💰 Sinal: R$ ${res.sinal.toFixed(2)}${msgSinal}`;
+                    window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msgText)}`);
+                    location.reload(); 
+                } else {
+                    alert("A Cozinha recusou o pedido: " + retorno.erro);
+                    btn.disabled = false;
+                    btn.innerText = "TENTAR NOVAMENTE";
+                }
+
             } catch (e) { 
-                alert("Erro ao salvar: " + e); 
+                alert("Erro de comunicação. O servidor no VS Code está ligado?"); 
+                console.error(e);
                 btn.disabled = false;
                 btn.innerText = "TENTAR NOVAMENTE";
             }
