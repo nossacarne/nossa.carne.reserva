@@ -20,12 +20,11 @@
         .hidden { display: none !important; }
         
         #portal { height: 100vh; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png'); background-size: cover; background-position: center; text-align: center; padding: 20px; }
-        .logo-main { width: 180px; max-width: 80%; margin-bottom: 20px; border-radius: 20px; border: 2px solid var(--gold); background: #fff; }
+        .logo-main { width: 180px; max-width: 80%; margin-bottom: 20px; border-radius: 20px; border: 2px solid var(--gold); background: #fff; cursor: pointer; }
         .portal-title { font-family: 'Montserrat', sans-serif; font-size: 22px; color: #fff; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 8px; font-style: italic; }
         
         .btn-portal { width: 90%; max-width: 320px; padding: 18px; margin: 10px; border-radius: 15px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; }
         .btn-c { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4); }
-        .btn-l { background: #333; color: #fff; border: 1px solid #444; }
 
         #view-cliente { background: #f4f4f4; color: #333; min-height: 100vh; width: 100%; padding: 70px 15px 30px; display: flex; flex-direction: column; align-items: center; }
         .card-cliente { background: white; border-radius: 25px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: 0 auto; }
@@ -59,10 +58,9 @@
 <body>
 
     <div id="portal">
-        <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main">
+        <img src="https://static.ifood-static.com.br/image/upload/t_high/logosgde/ef733dfb-3edf-42ef-9aea-9a87b00dcbdc/202510141310_BXc1_i.png" class="logo-main" onclick="toqueSecreto()">
         <div class="portal-title">Reserva Nossa Carne</div>
         <button class="btn-portal btn-c" id="btnIrCliente" onclick="ir('cliente')"><i class="fas fa-utensils"></i> NOVA RESERVA</button>
-        <button class="btn-portal btn-l" id="btnIrLoja" onclick="ir('loja')"><i class="fas fa-lock"></i> PAINEL ADM</button>
     </div>
 
     <button id="btnHome" class="btn-home hidden" onclick="location.reload()">VOLTAR</button>
@@ -76,7 +74,7 @@
             <h3 style="text-align:center; color:var(--primary); margin-top:0;">Nova Reserva</h3>
             <div class="regras-box">
                 <b>REGRAS DA CASA:</b><br>
-                • <B>Reservas</B> : a partir de <b>10 pessoas</b>.<br>
+                • <b>Reservas</b> : a partir de <b>10 pessoas</b>.<br>
                 • <b>Horário</b> : <b>12h às 21:30</b> (Seg a Qui).<br>
                 • <b>Bolo Cortesia</b>: 10+ pessoas ganha 1kg grátis.<br>
                 • <b>Sinal:</b> 50% se houver encomenda de bolo.<br>
@@ -84,9 +82,9 @@
             </div>
 
             <label>Nome Completo</label>
-            <input type="text" id="c_nome" placeholder="Seu nome" oninput="calc()">
+            <input type="text" id="c_nome" placeholder="Seu nome" maxlength="60" oninput="calc()">
             <label>(DDD) Telefone</label>
-            <input type="tel" id="c_tel" placeholder="11999999999" oninput="calc()">
+            <input type="tel" id="c_tel" placeholder="11999999999" maxlength="11" oninput="calc()">
             
             <label>Data da Reserva</label>
             <select id="c_data" onchange="calc()">
@@ -100,7 +98,7 @@
                         <option value="">--:--</option>
                     </select>
                 </div>
-                <div><label>Pessoas</label><input type="number" id="c_qtd" value="10" min="10" oninput="calc()"></div>
+                <div><label>Pessoas</label><input type="number" id="c_qtd" value="10" min="10" max="100" oninput="calc()"></div>
             </div>
 
             <label>Encomendar Bolo da Casa?</label>
@@ -119,7 +117,7 @@
                     <option>Prestígio</option>
                 </select>
                 <label>Peso Total (Kg)</label>
-                <input type="number" id="c_kg" value="1" min="1" step="0.5" oninput="calc()">
+                <input type="number" id="c_kg" value="1" min="1" max="10" step="0.5" oninput="calc()">
 
                 <div id="painelFinanceiro" class="pix-box hidden">
                     <p style="margin:0; font-weight:bold; color:#d35400; font-size:12px;">PAGAMENTO DO SINAL</p>
@@ -168,16 +166,13 @@
             measurementId: "G-0E1XTDECP7"
         };
         
-        // 1. Inicialização Segura do Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         
-        // 2. Inicializa o Banco e a Autenticação PRIMEIRO
         const db = firebase.firestore();
         const auth = firebase.auth(); 
 
-        // 3. Inicialização do App Check encapsulada
         try {
             const appCheck = firebase.appCheck();
             appCheck.activate(
@@ -195,8 +190,32 @@
         let valorSinalGlobal = 0;
         let reservasNuvem = [];
 
+        // FUNÇÃO DE SEGURANÇA: Sanitização contra XSS
+        function sanitizar(texto) {
+            if (!texto) return "";
+            const substitutos = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;', "/": '&#x2F;' };
+            return String(texto).replace(/[&<>"'/]/g, s => substitutos[s]).trim();
+        }
+
+        // FUNÇÃO DE SEGURANÇA ADM: Toque Secreto na Logo
+        let contadorToques = 0;
+        function toqueSecreto() {
+            contadorToques++;
+            if (contadorToques >= 5) {
+                contadorToques = 0;
+                ir('loja');
+            }
+            // Zera o contador se a pessoa demorar mais de 3 segundos para dar os 5 toques
+            setTimeout(() => { contadorToques = 0; }, 3000); 
+        }
+
         window.onload = function() {
             gerarOpcoes();
+            // FUNÇÃO DE SEGURANÇA ADM: Link Direto
+            // Se você acessar nossacarne.github.io/nossa.carne.reserva/#adm ele abre o painel
+            if(window.location.hash === '#adm') {
+                ir('loja');
+            }
         };
 
         function gerarOpcoes() {
@@ -230,21 +249,16 @@
                     monitorarReservas();
                     return;
                 }
-
-                const emailAdmin = prompt("E-mail do Administrador:");
+                const emailAdmin = prompt("🔐 ACESSO RESTRITO\nE-mail do Administrador:");
                 if (!emailAdmin) return;
-                
-                const senhaAdmin = prompt("Senha:");
+                const senhaAdmin = prompt("🔐 Senha:");
                 if (!senhaAdmin) return;
-
                 try {
                     await auth.signInWithEmailAndPassword(emailAdmin, senhaAdmin);
-                    alert("Login realizado com sucesso!");
                     mostrarTela(v);
                     monitorarReservas();
                 } catch (error) {
-                    alert("Acesso negado: E-mail ou senha incorretos.");
-                    console.error("Erro de login:", error.code);
+                    alert("❌ Acesso negado. Credenciais incorretas.");
                 }
                 return;
             }
@@ -253,10 +267,8 @@
 
         function sairAdm() {
             auth.signOut().then(() => {
-                alert("Você saiu do painel administrativo.");
-                location.reload(); 
-            }).catch((error) => {
-                console.error("Erro ao sair:", error);
+                window.location.hash = ''; // Limpa o link
+                location.reload();
             });
         }
 
@@ -290,27 +302,28 @@
         function copiarPix() { navigator.clipboard.writeText(PIX_STRING); alert("Pix Copiado!"); }
         function confirmarSinal() { sinalOk = true; document.getElementById('btnConfirmSinal').style.background = "#27ae60"; document.getElementById('btnConfirmSinal').innerText = "CONFIRMADO ✓"; calc(); }
 
-        // ==========================================
-        // FUNÇÃO ENVIAR CONECTADA AO NOVO BACK-END NA RENDER
-        // ==========================================
         async function enviar() {
             const btn = document.getElementById('btnWhatsApp');
+            
+            // BLINDAGEM E LIMPEZA DE DADOS ANTES DE ENVIAR PARA RENDER
+            const res = {
+                nome: sanitizar(document.getElementById('c_nome').value).substring(0, 60),
+                tel: document.getElementById('c_tel').value.replace(/\D/g,'').substring(0, 11),
+                data: sanitizar(document.getElementById('c_data').value),
+                hora: sanitizar(document.getElementById('c_hora').value),
+                qtd: Math.abs(parseInt(document.getElementById('c_qtd').value)) || 10,
+                sabor: sanitizar(document.getElementById('c_sabor').value) || 'N/A',
+                bolo: document.getElementById('c_bolo').value === 'sim' ? sanitizar(document.getElementById('c_kg').value) + 'kg' : 'Não',
+                sinal: parseFloat(valorSinalGlobal) || 0
+            };
+
+            if (res.nome.length < 3) { alert("Por favor, preencha um nome válido."); return; }
+
             btn.disabled = true;
             btn.innerText = "ENVIANDO...";
 
-            const res = {
-                nome: document.getElementById('c_nome').value,
-                tel: document.getElementById('c_tel').value.replace(/\D/g,''),
-                data: document.getElementById('c_data').value,
-                hora: document.getElementById('c_hora').value,
-                qtd: document.getElementById('c_qtd').value,
-                sabor: document.getElementById('c_sabor').value || 'N/A',
-                bolo: document.getElementById('c_bolo').value === 'sim' ? document.getElementById('c_kg').value + 'kg' : 'Não',
-                sinal: valorSinalGlobal
-            };
-
             try {
-                // Seu site agora aponta para o servidor online na Render
+                // RENDER - SEU SERVIDOR ONLINE
                 const respostaCozinha = await fetch('https://nossacarne-api.onrender.com/api/reservas', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -320,20 +333,18 @@
                 const retorno = await respostaCozinha.json(); 
 
                 if (retorno.sucesso) {
-                    alert("Reserva processada com sucesso pelo nosso servidor!");
-                    
+                    alert("Reserva enviada com sucesso! Aguarde nossa confirmação.");
                     let msgSinal = res.sinal > 0 ? `\n\n⚠️ *Favor enviar o comprovante do sinal.*` : "";
                     const msgText = `*RESERVA NOSSA CARNE*\n👤 ${res.nome}\n📅 ${res.data.split('-').reverse().join('/')}\n⏰ ${res.hora}\n👥 ${res.qtd} pessoas\n🎂 Bolo: ${res.bolo}\n💰 Sinal: R$ ${res.sinal.toFixed(2)}${msgSinal}`;
                     window.open(`https://wa.me/5511967105333?text=${encodeURIComponent(msgText)}`);
                     location.reload(); 
                 } else {
-                    alert("A Cozinha recusou o pedido: " + retorno.erro);
+                    alert("Erro: " + retorno.erro);
                     btn.disabled = false;
                     btn.innerText = "TENTAR NOVAMENTE";
                 }
-
             } catch (e) { 
-                alert("Erro de comunicação com o servidor."); 
+                alert("Erro de conexão com o servidor. Tente novamente."); 
                 console.error(e);
                 btn.disabled = false;
                 btn.innerText = "TENTAR NOVAMENTE";
@@ -344,8 +355,6 @@
             db.collection("reservas").orderBy("data", "asc").onSnapshot((snapshot) => {
                 reservasNuvem = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderAdm();
-            }, (error) => {
-                document.getElementById('listaAdm').innerText = "Erro ao carregar: Verifique as Regras Firestore.";
             });
         }
 
@@ -353,32 +362,27 @@
             db.collection("reservas").doc(id).update({ status: statusAtual === 'pendente' ? 'confirmado' : 'pendente' });
         }
 
-        function apagar(id) { if(confirm("Remover esta reserva definitivamente?")) db.collection("reservas").doc(id).delete(); }
+        function apagar(id) { if(confirm("Deseja apagar esta reserva do sistema?")) db.collection("reservas").doc(id).delete(); }
 
         function imprimirComanda(id) {
             const r = reservasNuvem.find(res => res.id === id);
             if(!r) return;
-            
             const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
-            const htmlComanda = `
+            document.getElementById('printArea').innerHTML = `
                 <div style="text-align:center; font-weight:bold; font-size:20px; margin-bottom:5px;">NOSSA CARNE</div>
                 <div style="text-align:center; font-size:14px; margin-bottom:15px; text-transform:uppercase;">Comanda de Reserva</div>
                 <div style="border-bottom:1px dashed #000; margin-bottom:10px;"></div>
                 <div><b>CLIENTE:</b> ${r.nome.toUpperCase()}</div>
                 <div><b>TELEFONE:</b> ${r.tel}</div>
-                <div><b>DATA:</b> ${dataFormat}</div>
-                <div><b>HORA:</b> ${r.hora}h</div>
+                <div><b>DATA:</b> ${dataFormat} às ${r.hora}</div>
                 <div><b>PESSOAS:</b> ${r.qtd}</div>
                 <div style="border-bottom:1px dashed #000; margin:10px 0;"></div>
                 <div><b>BOLO:</b> ${r.bolo}</div>
                 <div><b>SABOR:</b> ${r.sabor || 'N/A'}</div>
-                <div><b>SINAL (PAGO):</b> R$ ${parseFloat(r.sinal || 0).toFixed(2)}</div>
+                <div><b>SINAL:</b> R$ ${parseFloat(r.sinal || 0).toFixed(2)}</div>
                 <div><b>STATUS:</b> ${r.status.toUpperCase()}</div>
                 <div style="border-bottom:1px dashed #000; margin:10px 0;"></div>
-                <div style="text-align:center; font-size:11px; margin-top:10px;">Impresso em: ${new Date().toLocaleString('pt-BR')}</div>
             `;
-            
-            document.getElementById('printArea').innerHTML = htmlComanda;
             window.print();
         }
 
@@ -392,12 +396,8 @@
             if(filtrados.length === 0) { list.innerHTML = "<p style='text-align:center;'>Nenhuma reserva.</p>"; return; }
 
             filtrados.forEach(r => {
-                const isConflito = filtrados.filter(x => x.data === r.data && x.hora === r.hora).length > 1;
                 const dataFormat = r.data ? r.data.split('-').reverse().join('/') : '---';
-                
-                const msgConfirmacao = `Olá ${r.nome}, tudo bem? Sou da Nossa Carne! Passando para confirmar sua reserva para o dia ${dataFormat} às ${r.hora}. Podemos confirmar?`;
-                const linkWpp = `https://wa.me/55${r.tel}?text=${encodeURIComponent(msgConfirmacao)}`;
-
+                const linkWpp = `https://wa.me/55${r.tel}?text=${encodeURIComponent('Olá ' + r.nome + ', somos da Nossa Carne! Passando para confirmar sua reserva para o dia ' + dataFormat + ' às ' + r.hora + '.')}`;
                 list.innerHTML += `
                 <div class="reserva-card-adm">
                     <span class="status-badge ${r.status === 'confirmado' ? 'status-confirmado' : 'status-pendente'}">${r.status}</span>
@@ -405,13 +405,12 @@
                         <div><b>${r.nome.toUpperCase()}</b><br><small>📱 ${r.tel}</small></div>
                         <div>
                             <button onclick="alternarStatus('${r.id}', '${r.status}')" style="background:#eee; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fas fa-check"></i></button>
-                            <button onclick="window.open('${linkWpp}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer;"><i class="fab fa-whatsapp"></i></button>
+                            <button onclick="window.open('${linkWpp}')" style="background:var(--success); color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer; margin-left:5px;"><i class="fab fa-whatsapp"></i></button>
                             <button onclick="imprimirComanda('${r.id}')" style="background:#3498db; color:#fff; border:none; padding:8px; border-radius:8px; cursor:pointer; margin-left:5px;"><i class="fas fa-print"></i></button>
                             <button onclick="apagar('${r.id}')" style="background:none; border:none; color:red; cursor:pointer; margin-left:5px;"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
-                    <div style="font-size:13px; color:#555; margin-top:5px;">📅 ${dataFormat} às ${r.hora} | 👥 ${r.qtd} | 🎂 ${r.bolo}</div>
-                    ${isConflito ? `<div class="alerta-conflito">⚠️ Outra reserva no mesmo horário!</div>` : ''}
+                    <div style="font-size:12px; margin-top:5px; color:#555;">📅 ${dataFormat} às ${r.hora} | 👥 ${r.qtd} | 🎂 ${r.bolo}</div>
                 </div>`;
             });
         }
